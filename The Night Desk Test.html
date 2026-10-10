@@ -1,0 +1,736 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>The Night Desk Test</title>
+<style>
+:root{--bg:#0c1512;--pan:#13211c;--line:#2a4a3f;--ink:#d3e6da;--dim:#7c9a8d;--amb:#f2a93b;--obj:#ff6a4a;--ok:#6be38f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "Trebuchet MS",Verdana,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit;background:var(--pan);border:1px solid var(--line);padding:6px 12px;cursor:pointer;border-radius:3px}
+button:hover{border-color:var(--amb)}
+.none{display:none!important}.dim{color:var(--dim)}
+#app{height:100%;display:grid;grid-template-rows:46px 1fr 34px;grid-template-columns:1fr 290px}
+#top{grid-column:1/3;display:flex;align-items:center;gap:8px;padding:0 10px;border-bottom:1px solid var(--line);background:var(--pan);position:relative}
+#obj{border-color:var(--obj);color:var(--obj);font-weight:bold;min-width:220px;text-align:left}
+#obj.in{animation:fc .7s ease-out}
+@keyframes fc{from{transform:translateX(320px);opacity:0}to{transform:none;opacity:1}}
+#obj.sel{background:var(--obj);color:#1a0a06}
+#obj.done{border-color:var(--line);color:var(--dim);text-decoration:line-through}
+.ct{padding:6px 10px}.ct.on{border-color:var(--amb);color:var(--amb)}
+.ct.ring{animation:bl .7s infinite}@keyframes bl{50%{background:#3b2f12}}
+.ct.sb{border-color:var(--amb);animation:bl 1.4s infinite}.ct.sb::after{content:" standby";font-size:11px;color:var(--amb)}
+.ct.un::after{content:"\25CF";color:var(--obj);margin-left:6px}
+#right{margin-left:auto;display:flex;gap:8px;align-items:center}#clock{font-family:"Courier New",monospace;color:var(--amb);font-size:17px}
+#menu{display:none;position:absolute;top:46px;left:6px;background:var(--pan);border:1px solid var(--line);z-index:200;padding:6px;min-width:170px}
+#menu.on{display:block}#menu button{display:block;width:100%;text-align:left;border:0;margin:2px 0}
+#desk{position:relative;overflow:hidden}
+#seal{position:absolute;left:50%;top:50%;width:230px;height:230px;margin:-115px 0 0 -115px;border:2px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--line);font:bold 13px/1.5 "Courier New",monospace;letter-spacing:2px;pointer-events:none}
+#icoD{position:absolute;left:12px;top:12px;width:84px;text-align:center;padding:8px 4px;border-color:transparent;background:none}
+#icoD:hover{background:var(--pan)}
+.win{position:absolute;background:var(--pan);border:1px solid var(--line);box-shadow:0 6px 24px #0008;max-height:calc(100% - 10px);display:flex;flex-direction:column;transition:transform .35s ease-in,opacity .35s}
+.win.min{opacity:0;pointer-events:none}
+.wh{display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid var(--line);color:var(--amb);font-weight:bold;cursor:move;touch-action:none;user-select:none}
+.wh span{flex:1}.wh button{padding:3px 6px;border:0;line-height:0}
+.wb{padding:14px;overflow:auto}
+#nm{background:#0a110f;border:1px solid var(--amb);padding:8px;min-height:38px;font:18px "Courier New",monospace;margin:8px 0}
+.kb{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0}.kb button{width:36px;padding:7px 0;font-family:"Courier New",monospace}.kb .w{width:auto;padding:7px 14px}
+.hd{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.av{width:54px;height:54px;border-radius:50%;background:var(--line);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px}
+.nm{font-size:20px;font-weight:bold}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fld{border:1px solid transparent;background:#0f1a16;padding:6px 8px;border-radius:3px}.fld span{display:block;color:var(--dim);font-size:12px}.fld.wide{grid-column:1/3}
+.selecting #desk{cursor:crosshair}
+.selecting #side,.selecting #seal{opacity:.35}
+.conf{border:1px solid var(--obj);color:var(--obj);padding:6px 8px;font-size:12px;margin:6px 0}
+.wb h3{margin:8px 0}.wb p{margin:6px 0;max-width:62ch}
+#bar{grid-column:1;border-top:1px solid var(--line);background:var(--pan);display:flex;gap:4px;padding:3px 6px;align-items:center;overflow:hidden}
+#bar button{padding:3px 12px}#bar button.mn{color:var(--dim);border-style:dashed}
+#side{grid-row:2/4;grid-column:2;border-left:1px solid var(--line);background:var(--pan);display:flex;flex-direction:column;min-height:0;position:relative}
+#note{margin:10px;padding:10px;border:1px solid var(--amb);cursor:pointer;animation:fc .6s ease-out}
+#call{padding:10px}.rg{font-size:13px;color:var(--amb)}.rg b{display:block;font-size:18px;color:var(--ink)}
+.cb{display:flex;gap:8px;margin-top:10px}.cb button{flex:1}
+#ans{border-color:var(--ok);color:var(--ok)}.ar{font-style:normal;display:inline-block;animation:ar .7s infinite}@keyframes ar{50%{transform:translateX(7px)}}
+#who{padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;color:var(--dim)}#who b{display:block;color:var(--ink);font-size:16px}
+#chats{flex:1;overflow:hidden;min-height:0;position:relative}.ch{height:100%;overflow:auto;padding:10px}
+.m{margin:6px 0;padding:6px 9px;border-radius:3px;max-width:92%}.m.t{background:#1a3a2c}.m.p{background:#3b2f12;color:#ffd78a;margin-left:auto}.m.s{color:var(--dim);font-size:12px;text-align:center;max-width:100%;border-top:1px solid var(--line);padding-top:6px;margin:12px 0}
+#reps{padding:8px;display:flex;flex-direction:column;gap:6px}#reps:empty{display:none}
+.cv{min-height:100%}
+#side.calling #chats,#side.calling #who,#side.calling #reps,#side.calling #note{display:none}#side.calling #call{flex:1}
+.cc{display:flex;gap:12px;align-items:center;padding:10px}.cc b{display:block;font-size:17px}.cc small{color:var(--dim)}.cc table{font-size:12px;border-spacing:0 2px;margin-top:4px}.cc td{padding-right:12px;color:var(--dim)}.cc td.ok{color:var(--ok)}.cc td.am{color:var(--amb)}#who .cc{padding:6px 2px}
+.path{background:var(--amb);color:#1a1200;font:13px "Courier New",monospace;padding:3px 8px;display:inline-block;margin:0 0 12px}
+.fl{display:flex;gap:16px;flex-wrap:wrap;min-height:110px}.fi,#icoD{display:flex;flex-direction:column;align-items:center;gap:4px}.fi{background:none;border:1px solid transparent;width:90px}.fi:hover{border-color:var(--amb)}.fi svg,#icoD svg{width:42px;height:42px}
+.sbar{border-top:1px solid var(--line);margin-top:10px;padding-top:6px;font-size:12px}
+#menu{width:380px;padding:10px}.mh{color:var(--amb);font-size:12px;margin:8px 0 4px;border-bottom:1px solid var(--line)}.mg{display:flex;flex-wrap:wrap;gap:6px}
+#menu .ai{display:flex;flex-direction:column;align-items:center;gap:4px;width:80px;text-align:center;margin:0;padding:6px 2px;font-size:12px;border:0;background:none}#menu .ai:hover{background:#1b2f28}#menu .ai[disabled]{opacity:.4;cursor:default}#menu .ai svg{width:34px;height:34px}
+#ln{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:300}
+#ln path{fill:none;stroke-width:3;stroke-dasharray:1;stroke-dashoffset:1;animation:dr .5s forwards}@keyframes dr{to{stroke-dashoffset:0}}
+#ln g{animation:pop .3s .55s backwards}@keyframes pop{from{transform:scale(0)}}
+.fly{position:fixed;z-index:310;background:#3b2f12;color:#ffd78a;padding:6px 9px;border-radius:3px;transition:left .8s ease-in-out,top .8s ease-in-out,opacity .8s;max-width:240px}
+#toast{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);background:var(--pan);border:1px solid var(--obj);padding:8px 14px;z-index:320;display:none;max-width:90%}
+#card{position:fixed;inset:0;background:#000;z-index:400;display:flex;align-items:flex-end;padding:0 8% 14%;font:20px/1.6 "Courier New",monospace;color:#fff;white-space:pre-line;transition:opacity 1s}
+#card.off{opacity:0;pointer-events:none}#card button{margin-top:18px;font-size:16px}
+#rot{display:none;position:fixed;inset:0;z-index:500;background:var(--bg);align-items:center;justify-content:center;text-align:center;padding:30px}
+@media (orientation:portrait) and (max-width:700px){#rot{display:flex}}
+
+/* modern harbour terminal skin */
+:root{--g:#0b2142;--g2:#0e2850;--bl:#2f63a6;--glow:#5fa8ff;--cy:#5fd0ff}
+*{border-radius:0!important;scrollbar-width:thin;scrollbar-color:#2f63a6 #07162b}
+html,body{background:#050f1f;font:14px/1.45 "Segoe UI","Trebuchet MS",Tahoma,Arial,sans-serif;letter-spacing:.2px}
+button{background:transparent;color:#cfe3ff;border:1px solid var(--bl);box-shadow:none}
+button:hover{border-color:var(--glow);box-shadow:0 0 10px #2f63a666;outline:0}
+button:active{background:var(--g2)}
+.fi,#icoD,#menu .ai{box-shadow:none!important;outline:0!important;border:1px solid transparent}
+#top{background:#07162b;color:#cfe3ff;border:0;border-bottom:1px solid var(--bl);box-shadow:0 1px 16px #2f63a633}
+#bar{background:#07162b;color:#cfe3ff;border:0;border-top:1px solid var(--bl);box-shadow:none}
+#clock{background:none;color:var(--cy);font-weight:bold;letter-spacing:1px;padding:0 6px;box-shadow:none}
+#obj{color:var(--amb);border-color:var(--amb);background:#241a06;font-weight:700;text-transform:uppercase;font-size:12px;letter-spacing:.8px}
+#obj.sel{background:var(--amb);color:#1a1200}#obj.done{color:#5d7ea8;border-color:#1d3b66;background:none}
+.ct{border-color:transparent;text-transform:uppercase;font-size:12px;letter-spacing:.6px}
+.ct.on{background:var(--bl);color:#fff;border-color:var(--bl);box-shadow:0 0 14px #2f63a688}
+@keyframes bl{50%{background:#5a3f0a}}
+#bar button.mn{color:#7f9bc2;border-style:dashed}
+#desk{background:radial-gradient(ellipse at 50% 35%,#0c2748,#050f1f 72%)}
+#desk::after{content:"SIN // NIGHT DESK // TERMINAL 14";position:absolute;right:12px;bottom:8px;font:11px "Courier New",monospace;color:#2f63a6}
+#seal{border:0;width:260px;height:260px;margin:-130px 0 0 -130px;display:block;opacity:.35}
+#icoD{color:#cfe3ff}#icoD:hover{background:#0e285099}
+#menu{background:#07162b;color:#cfe3ff;border:1px solid var(--bl);box-shadow:0 10px 34px #000b,0 0 16px #2f63a633}
+.mh{color:var(--glow);border-bottom:1px solid #1d3b66;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px}
+#menu .ai:hover,.fi:hover{background:var(--g2);color:#fff;border-color:var(--bl)}
+#menu .ai svg,.fi svg{filter:none}
+.win{background:#07162b;border:1px solid var(--bl);padding:0;color:#cfe3ff;box-shadow:0 12px 40px #000c,0 0 18px #2f63a633}
+.wh{background:var(--g);color:#e4eeff;border:0;border-bottom:1px solid #1d3b66;padding:8px 10px;text-transform:uppercase;letter-spacing:1px;font-size:12px}
+.wh button{border:0;color:var(--cy)}
+.wb{background:#07162b;color:#cfe3ff}
+.dim{color:#7f9bc2}
+#nm{background:#040c18;border:1px solid var(--bl);color:var(--cy);box-shadow:none}
+.fld{background:var(--g);color:#e4eeff;border:1px solid #1d3b66;box-shadow:none}.fld span{color:#7f9bc2;text-transform:uppercase;font-size:10px;letter-spacing:1px}
+.av{background:#14355c;color:#cfe3ff;box-shadow:none}
+.path{background:var(--g);color:var(--cy);display:block;border:1px solid #1d3b66;box-shadow:none}
+.conf{border:1px solid var(--obj);color:#ff8a70;background:#2a0f0a}
+.sbar{border-top:1px solid #1d3b66;color:#7f9bc2}
+#side{background:#07162b;border-left:1px solid var(--bl);color:#cfe3ff}
+#who,#call{background:#07162b;color:#cfe3ff}#who b{color:#e4eeff}
+.cc small,.cc td{color:#7f9bc2}.cc td.ok{color:var(--ok)}.cc td.am{color:var(--amb)}.rg{color:var(--amb);font-weight:bold}
+#chats{background:transparent;margin:0 6px;box-shadow:none}
+.m.t{background:#0f2f57;color:#e4eeff}.m.p{background:#3a2b0a;color:#ffd78a}.m.s{border-top-color:#1d3b66;color:#7f9bc2}
+#note{background:var(--g);color:#cfe3ff;border:1px solid var(--amb);box-shadow:0 0 14px #f2a93b33}
+#ans{color:var(--ok)}
+#toast{background:var(--g);color:#e4eeff;border:1px solid var(--obj);box-shadow:none}
+
+#icoP{position:absolute;left:12px;top:100px;width:84px;padding:8px 4px;background:none;color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:none!important}#icoP svg{width:42px;height:42px}#icoP:hover{background:#0e2850}
+.vid{position:relative;height:200px;background:linear-gradient(#0b1b2b 0 55%,#0a2a3d 55%);overflow:hidden;border:1px solid #1d3b66}
+.hull{position:absolute;left:60px;right:60px;top:78px;height:70px;background:#2a3540;clip-path:polygon(0 0,100% 0,92% 100%,8% 100%);display:flex;align-items:center;justify-content:center}
+#plate{filter:blur(5px);color:#111;font:bold 18px "Courier New",monospace;padding:2px 10px;background:#e8e2c8;transition:filter 1.2s}#plate.sharp{filter:none}
+.ts{position:absolute;left:8px;top:6px;color:#9fe0a8;font:12px "Courier New",monospace}
+.scan{position:absolute;left:0;right:0;top:0;height:3px;background:#9fe0a8;opacity:0}.go .scan{animation:sc 1.5s linear}
+@keyframes sc{0%{opacity:.9;top:0}100%{opacity:.9;top:100%}}
+#icoF{position:absolute;left:12px;top:188px;width:84px;padding:8px 4px;background:none;color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:none!important}#icoF svg{width:42px;height:42px}#icoF:hover{background:#0e2850}
+
+#login{position:fixed;inset:0;z-index:450;background:#040b16;display:flex;align-items:center;justify-content:center;transition:opacity .8s}#login.off{opacity:0;pointer-events:none}
+.lg{width:min(460px,92%);text-align:center}.lgs{width:150px;height:150px}.lg h2{font:bold 15px "Courier New",monospace;color:#9fc3ee;letter-spacing:2px;margin:10px 0 18px}
+.row{display:flex;gap:10px;align-items:center;margin:10px 0}.row label{width:90px;text-align:right;color:#9fc3ee;font:14px "Courier New",monospace}
+.in{flex:1;text-align:left;background:#071a31;border:1px solid #2f63a6;color:var(--amb);font:16px "Courier New",monospace;padding:6px 8px;min-height:34px;cursor:pointer}.in i{color:#5d7ea8;font-size:12px}
+#lgo{margin-top:8px;padding:6px 26px}#lgo:disabled{opacity:.5}.warn{color:#ff5a4a;font:12px/1.5 "Courier New",monospace;margin-top:20px}
+.fl #desk,.fl #top,.fl #side{animation:fk .3s 5 alternate}@keyframes fk{to{opacity:.15}}
+
+#mm{position:fixed;inset:0;z-index:460;background:#040b16;display:flex;align-items:center;justify-content:center;transition:opacity .8s}#mm.off{opacity:0;pointer-events:none}
+.lg h1{font:bold 28px "Courier New",monospace;color:#d3e6da;letter-spacing:6px;margin:8px 0 2px}.dim2{color:#6f8fb8;font:13px "Courier New",monospace}
+.mb{display:flex;flex-direction:column;gap:10px;width:240px;margin:20px auto 0}.mb button{padding:10px}#cr2{margin-top:20px;font:14px/1.9 "Courier New",monospace;color:#9fc3ee}
+#asc{position:absolute;inset:0;margin:0;color:#4dff9a;opacity:.13;font:11px/12px "Courier New",monospace;overflow:hidden;pointer-events:none;white-space:pre}body.gh #desk{background:#010a05}body.gh #seal{opacity:.08}body.gh #desk::after{content:"GHOST // UNLISTED";color:#4dff9a}
+#dk{position:absolute;left:12px;top:92px;bottom:12px;display:flex;flex-direction:column;flex-wrap:wrap;gap:4px;align-content:flex-start;z-index:2}.dki{display:flex;flex-direction:column;align-items:center;gap:4px;width:84px;padding:6px 4px;background:none;border:1px solid transparent;color:#cfe3ff;font-size:12px}.dki svg{width:38px;height:38px}.dki:hover{background:#0e285099;border-color:var(--bl)}
+.dki.nw{border-color:var(--amb)}.dki.nw::after{content:"NEW";color:#1a1200;background:var(--amb);font:bold 9px sans-serif;padding:1px 5px;margin-top:-2px;animation:bl 1s infinite}
+#tst{position:fixed;top:0;left:0;right:0;height:24px;z-index:700;display:flex;align-items:center;gap:2px;padding:0 6px;background:#2a0f0a;border-bottom:1px solid #ff6a4a;font:11px "Courier New",monospace;color:#ff8a70}#tst b{margin-right:6px;letter-spacing:1px}#tst button{padding:1px 6px;font:11px "Courier New",monospace;border:1px solid #6a2a1a;color:#ffb8a8;min-width:24px}#tst button.cu{background:#ff6a4a;color:#1a0a06}body{padding-top:24px}
+</style></head><body>
+<div id="app">
+ <div id="top"><button id="apps">Applications</button>
+  <div id="menu"></div>
+  <button id="obj" class="none"></button><button id="hint" class="none">?</button>
+  <div id="right"><button class="ct none" id="cm">&#128222; Maddox</button><button class="ct none" id="cd">&#128222; Aldous</button><button class="ct none" id="ck">&#128222; Calloway</button><button class="ct none" id="cb">&#128222; Unknown</button><button class="ct none" id="co">&#128222; Okoro</button><button class="ct none" id="cn">&#128222; Nand</button><div id="clock">23:48</div></div></div>
+ <main id="desk"><svg id="seal" viewBox="0 0 240 240"><defs><path id="rp" d="M120 120m-96 0a96 96 0 1 1 192 0a96 96 0 1 1-192 0"/></defs><g fill="none" stroke="#3b6ea8" stroke-width="3"><circle cx="120" cy="120" r="112"/><circle cx="120" cy="120" r="74"/><path d="M104 190l8-80h16l8 80zM108 110h24l-3-14h-18zM112 96h16V84h-16zM120 76v-8M98 82l-10-6M142 82l10-6M94 92H80M146 92h14M60 198q15-10 30 0t30 0t30 0t30 0"/><ellipse cx="120" cy="90" rx="6" ry="3"/></g><circle cx="120" cy="90" r="1.8" fill="#3b6ea8"/><text fill="#3b6ea8" font-family="Georgia,serif" font-size="12.5" letter-spacing="2"><textPath href="#rp" startOffset="1%">SPECIAL INTELLIGENCE NETWORK * WE KEEP THE LIGHT *</textPath></text></svg><button id="icoD" class="none"></button><button id="icoP" class="none"></button><button id="icoF" class="none"></button></main>
+ <div id="bar"></div>
+ <aside id="side"><div id="note" class="none"><b>Welcome, Operator</b><div id="nb" class="none"><p class="dim" style="margin:8px 0">Please read the attached file before your first call.</p><button id="att">&#128206; Welcome.doc</button></div></div><div id="call"></div><div id="who">No active call.</div><div id="chats"><div class="ch" id="ch-m"></div><div class="ch" id="ch-d"></div><div class="ch" id="ch-r"></div><div class="ch" id="ch-b"></div><div class="ch" id="ch-o"></div><div class="ch" id="ch-n"></div></div><div id="reps"></div></aside>
+</div>
+<div id="tst"></div>
+<div id="login" class="off"><div class="lg"><div id="lgemb"></div><h2>SPECIAL INTELLIGENCE NETWORK</h2><div class="row"><label>User</label><div class="in" id="lu"><i>click to enter</i></div></div><div class="row"><label>Password</label><div class="in" id="lp"><i>click to enter</i></div></div><button id="lgo" disabled>Login</button><p class="warn">This is a confidential, monitored program. Any data leak, or any talk about it with anyone outside the SIN, can lead to serious criminal charges.</p></div></div>
+<div id="mm" class="off"><div class="lg"><div id="mmemb"></div><h1>THE NIGHT DESK</h1><div class="dim2">Special Intelligence Network</div><div id="mmb" class="mb"><button id="mmc"></button><button id="mmn">New game</button><button id="mmk">Credits</button></div><div id="cr2" class="none"><p>Story and design: YOUR NAME</p><p>Built with Claude</p><p>Music and sound: coming soon</p><button id="mmx">Back</button></div></div></div>
+<svg id="ln"></svg><div id="toast"></div><div id="card"></div><div id="rot">Rotate your phone to landscape to play.</div>
+<script>
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const CALL={m:{n:"Ines MADDOX",r:"Supervisor",id:"S-2204",i:"IM",ip:"10.4.22.8",b:"#cm"},d:{n:"Dov ALDOUS",r:"Field agent",id:"A-1187",i:"DA",ip:"10.4.31.60",b:"#cd"},b:{n:"Teodor BRANDT",r:"Unknown caller",id:"X-0000",i:"TB",ip:"unlisted",b:"#cb"},o:{n:"Sam OKORO",r:"City Police",id:"P-4410",i:"SO",ip:"10.9.2.14",b:"#co"},n:{n:"Priya NAND",r:"Records Audit",id:"R-7731",i:"PN",ip:"10.4.9.5",b:"#cn"},r:{n:"Rhea CALLOWAY",r:"Field agent",id:"A-2290",i:"RC",ip:"10.4.33.17",b:"#ck"}};
+const DB={"MARTA KESSLER":{n:"Marta KESSLER",i:"MK",st:"ALIVE",sex:"Female",age:34,h:"-",dob:"06/17/1977",occ:"-",bl:"-",mar:"-",addr:"14 Wren Lane, Port Alder",edit:"Created 02/14/2009. Never updated."},
+"WALTER BRENNICK":{n:"Walter BRENNICK",i:"WB",st:"ALIVE",sex:"Male",age:58,h:"5'9\"",dob:"03/21/1953",occ:"Fisherman",bl:"O-",mar:"Widowed",addr:"3 Cannery Steps, Port Alder",edit:"none"},
+"EMIL RASK":{n:"Emil RASK",i:"ER",st:"DECEASED",sex:"Male",age:52,h:"5'11\"",dob:"08/03/1959",occ:"Dock labourer",bl:"A+",mar:"Divorced",addr:"11 Salt Lane, Port Alder",edit:"none"},
+"HANNE OSTRAND":{n:"Hanne OSTRAND",i:"HO",st:"MISSING",sex:"Female",age:41,h:"-",dob:"04/12/1970",occ:"-",bl:"-",mar:"-",addr:"Last known: 6 Mill Row, Delta Coast",edit:"Created 02/14/2009. Never updated."},
+"PAVEL LIND":{n:"Pavel LIND",i:"PL",st:"MISSING",sex:"Male",age:47,h:"-",dob:"10/30/1964",occ:"-",bl:"-",mar:"-",addr:"Last known: 2 Ropewalk, Southmarch",edit:"Created 02/14/2009. Never updated."},
+"SORIN DRAY":{n:"Sorin DRAY",i:"SD",st:"MISSING",sex:"Male",age:38,h:"-",dob:"01/19/1973",occ:"-",bl:"-",mar:"-",addr:"Last known: 40 Keel Street, Northreach",edit:"Created 02/14/2009. Never updated."},
+"TESS VANCE":{n:"Tess VANCE",i:"TV",st:"MISSING",sex:"Female",age:33,h:"-",dob:"07/08/1978",occ:"-",bl:"-",mar:"-",addr:"Last known: 8 Anchor Court, Port Alder",edit:"Created 02/14/2009. Never updated."},
+"LUCAN HALE":{n:"Lucan HALE",i:"LH",st:"ALIVE",sex:"Male",age:52,h:"6'0\"",dob:"05/14/1959",occ:"Insurance director",bl:"AB+",mar:"Married",addr:"Greywater House, Eastreach",edit:"none"},
+"TEODOR BRANDT":{n:"Teodor BRANDT",i:"TB",st:"ALIVE",sex:"Male",age:63,h:"5'10\"",dob:"12/02/1947",occ:"Auditor, retired",bl:"O+",mar:"Widowed",addr:"12 Marsh Road, Delta Coast",edit:"none"},
+"DOV ALDOUS":{n:"Dov ALDOUS",n:"Dov ALDOUS",i:"DA",st:"ALIVE",sex:"Male",age:41,h:"6'1\"",dob:"02/09/1970",occ:"Field agent",bl:"B+",mar:"Divorced",addr:"Withheld",edit:"none"},
+"INES MADDOX":{n:"Ines MADDOX",i:"IM",st:"ALIVE",sex:"Female",age:51,h:"5'8\"",dob:"11/30/1959",occ:"Supervisor",bl:"A-",mar:"Married",addr:"Withheld",edit:"none"},"ANA VOSS":{n:"Ana VOSS",i:"AV",st:"ALIVE",sex:"Female",age:29,h:"5'5\"",dob:"09/02/1982",occ:"Bookkeeper",bl:"A+",mar:"Married",addr:"9 Cutler Row, Port Alder",edit:"none"}};
+let got=false,cur=null,mode="idle",typed="",talk=null,shown=null,zi=10,nw=0;const wins={},clock=[23,48];const conv={};let enh=false,wr;const welcomeRead=new Promise(r=>wr=r);const ts=()=>String(clock[0]).padStart(2,"0")+":"+String(clock[1]).padStart(2,"0");
+setInterval(()=>{if(++clock[1]>59){clock[1]=0;clock[0]=(clock[0]+1)%24}$("#clock").textContent=String(clock[0]).padStart(2,"0")+":"+String(clock[1]).padStart(2,"0")},14000);
+function view(k){shown=k;$("#reps").classList.toggle("none",k!=talk);document.querySelectorAll(".ch").forEach(e=>e.style.display=e.id=="ch-"+k?"block":"none");for(const x in CALL){$(CALL[x].b).classList.toggle("on",x==k)}$(CALL[k].b).classList.remove("un");$("#who").innerHTML=card(k,"ONLINE","ok")}
+const sb={};function standby(k){return new Promise(res=>{$(CALL[k].b).classList.remove("none");$(CALL[k].b).classList.add("sb");sb[k]=res})}
+for(const k in CALL)$(CALL[k].b).onclick=()=>{if(sb[k]){const f=sb[k];sb[k]=null;$(CALL[k].b).classList.remove("sb");f();return}view(k)};
+function line(c,t,k=talk){const d=document.createElement("div");d.className="m "+c;d.textContent=t;const h=$("#ch-"+k);(conv[k]||h).appendChild(d);h.scrollTop=1e5;if(k!=shown)$(CALL[k].b).classList.add("un");return d}
+const mark=(t,k=talk)=>line("s",t+" "+ts(),k);
+function newConv(k){const b=document.createElement("div");b.className="cv";$("#ch-"+k).appendChild(b);conv[k]=b;$("#ch-"+k).scrollTop=1e5}
+function join(k,t){$(CALL[k].b).classList.remove("none");talk=k;view(k);newConv(k);mark(t,k)}
+async function say(t){const d=line("t","");for(const ch of t){d.textContent+=ch;$("#ch-"+talk).scrollTop=1e5;await sleep(22)}await sleep(450)}
+function reply(o){return new Promise(res=>{const r=$("#reps");r.classList.toggle("none",shown!=talk);o.forEach((t,i)=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>{r.innerHTML="";line("p",t);res(i)};r.appendChild(b)})})}
+async function ask(o){const i=await reply(o.map(x=>x[0]));for(const t of o[i][1])await say(t)}
+function ring(k){return new Promise(res=>{const c=CALL[k];let hh;$("#side").classList.add("calling");$(c.b).classList.remove("none");$(c.b).classList.add("ring");
+ const show=()=>{$("#call").innerHTML=`<div class="rg">Incoming call</div>${card(k,"CALLING","am")}<div class="cb"><button id="hold">Hold</button><button id="ans">Answer <i class="ar">&#9654;&#9654;</i></button></div>`;
+ $("#hold").onclick=()=>{$("#call").innerHTML=`<div class="rg">On hold</div>${card(k,"WAITING","am")}`;hh=setTimeout(show,4000)};
+ $("#ans").onclick=()=>{clearTimeout(hh);$("#call").innerHTML="";$(c.b).classList.remove("ring");$("#side").classList.remove("calling");talk=k;view(k);newConv(k);mark("Call started");res()}};show()})}
+function toast(t){const e=$("#toast");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display="none",2600)}
+function objective(o){cur=o;mode="idle";const b=$("#obj");b.className="";void b.offsetWidth;b.className="in";b.textContent=o.text;$("#hint").classList.remove("none");return new Promise(r=>o.res=r)}
+$("#obj").onclick=()=>{if(!cur)return;mode=mode=="idle"?"sel":"idle";document.body.classList.toggle("selecting",mode=="sel");$("#obj").classList.toggle("sel",mode=="sel")};
+$("#hint").onclick=()=>cur&&toast(cur.hint);
+$("#apps").onclick=()=>$("#menu").classList.toggle("on");
+const ic={m:'<svg width="12" height="12"><path d="M2 9h8" stroke="currentColor" stroke-width="2"/></svg>',x:'<svg width="12" height="12"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="2"/></svg>'};
+function openWin(id,title,html,w){if(wins[id]){restore(id);return wins[id]}
+ const el=document.createElement("div");el.className="win";el.style.cssText=`width:min(${w}px,94%);left:${110+nw*26}px;top:${12+nw*26}px;z-index:${++zi}`;nw=(nw+1)%6;
+ el.innerHTML=`<div class="wh"><span>${title}</span><button class="wm" title="Minimize">${ic.m}</button><button class="wx" title="Close">${ic.x}</button></div><div class="wb">${html}</div>`;$("#desk").appendChild(el);
+ const tab=document.createElement("button");tab.textContent=title;$("#bar").appendChild(tab);const o=wins[id]={el,tab,min:false,id};
+ tab.onclick=()=>o.min?restore(id):minimize(id);el.querySelector(".wm").onclick=()=>minimize(id);
+ el.querySelector(".wx").onclick=()=>{el.remove();tab.remove();delete wins[id]};
+ el.addEventListener("pointerdown",()=>el.style.zIndex=++zi);
+ const h=el.querySelector(".wh");h.onpointerdown=e=>{if(e.target.closest("button"))return;const dr=$("#desk").getBoundingClientRect(),sx=e.clientX-el.offsetLeft,sy=e.clientY-el.offsetTop;h.setPointerCapture(e.pointerId);
+  h.onpointermove=ev=>{el.style.left=Math.max(0,Math.min(dr.width-el.offsetWidth,ev.clientX-sx))+"px";el.style.top=Math.max(0,Math.min(dr.height-el.offsetHeight,ev.clientY-sy))+"px"};h.onpointerup=()=>{h.onpointermove=null}};
+ return o}
+function minimize(id){const o=wins[id],t=o.tab.getBoundingClientRect(),r=o.el.getBoundingClientRect();o.el.style.transform=`translate(${t.left+t.width/2-r.left-r.width/2}px,${t.top-r.top-r.height/2}px) scale(.1)`;o.el.classList.add("min");o.min=true;o.tab.classList.add("mn")}
+function restore(id){const o=wins[id];o.el.style.transform="";o.el.classList.remove("min");o.min=false;o.tab.classList.remove("mn");o.el.style.zIndex=++zi}
+function openDb(){$("#menu").classList.remove("on");const o=openWin("db","HumanDB",'',520);search();return o}
+function search(){typed="";const kb="1234567890- QWERTYUIOP ASDFGHJKL ZXCVBNM".split(" "),b=wins.db.el.querySelector(".wb");
+ b.innerHTML=`<div class="dim">Citizen records. Type a full name.</div><div id="nm">_</div><div id="kb">${kb.map(r=>`<div class="kb">${[...r].map(c=>`<button data-c="${c}">${c}</button>`).join("")}</div>`).join("")}<div class="kb"><button class="w" data-c=" ">space</button><button class="w" data-c="<">delete</button><button class="w" data-c="=">Search</button></div></div>`;
+ b.querySelector("#kb").onclick=e=>{const c=e.target.dataset.c;if(!c)return;if(c=="<")typed=typed.slice(0,-1);else if(c=="=")return find();else typed+=c;b.querySelector("#nm").textContent=typed+"_"}}
+function find(){const r=DB[typed.trim()];if(!r){wins.db.el.querySelector(".wb").innerHTML=`<div class="fld wide" data-k="norec"><span>HumanDB result</span>NO RECORD FOUND for ${typed.trim()||"(blank)"}</div><p><button onclick="search()">Back to search</button></p>`;return}
+ const f=(k,l,v,w)=>`<div class="fld${w?" wide":""}" data-k="${k}"><span>${l}</span>${v}</div>`;
+ wins.db.el.querySelector(".wb").innerHTML=`<div class="hd"><div class="av">${r.i}</div><div><div class="nm">${r.n}</div><div class="fld" data-k="status" style="margin-top:3px"><span>Status</span>${r.st}</div></div></div><div class="grid">${f("sex","Sex",r.sex)}${f("age","Age",r.age)}${f("h","Height",r.h)}${f("dob","Date of birth",r.dob)}${f("occ","Occupation",r.occ)}${f("bl","Blood type",r.bl)}${f("mar","Marital status",r.mar)}${f("addr","Last known address",r.addr,1)}${f("edit","Record last updated",r.edit,1)}</div><p><button onclick="search()">Back to search</button></p>`}
+const CONF='<div class="conf">CONFIDENTIAL. This program, its records and its calls must never be copied, shared or removed. Leaks or theft of information can endanger people and operations, and lead to dismissal and criminal prosecution.</div>';
+function openWelcome(){wr();$("#note").classList.add("none");openWin("wel","Welcome.doc",`${path("./O0891/Docs/Welcome")}${CONF}<h3>Welcome, Operator O-0891</h3><p><b>Who you are.</b> You staff the night desk of the Special Intelligence Network. Field agents are not allowed to touch the Network's records. You are.</p><p><b>What you do.</b> Agents call in with a request. You take the call, search the records, and report back exactly what the records say. You do not guess and you do not investigate on your own.</p><p><b>Hierarchy.</b> The Records Director oversees all supervisors. Supervisors assign each call to an operator. Operators serve field agents. Field agents work the cases.</p><p>Your supervisor will contact you shortly.</p>${CONF}`,520)}
+function openDocs(){$("#menu").classList.remove("on");const o=openWin("doc","Documents",path("./O0891/Docs")+'<div class="fl">'+(got?`<button class="fi" id="fw">${I.d}<span>Welcome</span></button>`:"")+`</div><div class="sbar dim">0 folder(s) | ${got?1:0} file(s)</div>`,380);const w=o.el.querySelector("#fw");if(w)w.onclick=openWelcome}
+const I={f:'<svg viewBox="0 0 48 48"><path d="M4 12h15l4 5h21v23H4z" fill="#2a4a3f" stroke="#f2a93b" stroke-width="2"/></svg>',d:'<svg viewBox="0 0 48 48"><path d="M12 4h17l9 9v31H12z" fill="#13211c" stroke="#d3e6da" stroke-width="2"/><path d="M29 4v9h9M17 22h16M17 29h16M17 36h10" fill="none" stroke="#d3e6da" stroke-width="2"/></svg>',h:'<svg viewBox="0 0 48 48"><rect x="5" y="9" width="38" height="30" rx="3" fill="#13211c" stroke="#d3e6da" stroke-width="2"/><circle cx="18" cy="21" r="5" fill="#d3e6da"/><path d="M9 34c1-6 14-6 18 0M29 19h9M29 26h9" fill="none" stroke="#d3e6da" stroke-width="2"/></svg>',c:'<svg viewBox="0 0 48 48"><path d="M6 30l4-10h22l6 7 4 1v7H6z" fill="#13211c" stroke="#d3e6da" stroke-width="2"/><circle cx="15" cy="35" r="4" fill="#13211c" stroke="#d3e6da" stroke-width="2"/><circle cx="35" cy="35" r="4" fill="#13211c" stroke="#d3e6da" stroke-width="2"/></svg>',t:'<svg viewBox="0 0 48 48"><path d="M12 14h24l-2 28H14zM9 14h30M19 14V9h10v5" fill="none" stroke="#d3e6da" stroke-width="2"/></svg>',g:'<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="8" fill="none" stroke="#d3e6da" stroke-width="2"/><circle cx="24" cy="24" r="16" fill="none" stroke="#d3e6da" stroke-width="5" stroke-dasharray="6 6"/></svg>',x:'<svg viewBox="0 0 48 48"><rect x="5" y="9" width="38" height="30" rx="3" fill="#13211c" stroke="#d3e6da" stroke-width="2"/><path d="M12 19l7 5-7 5M23 30h10" fill="none" stroke="#f2a93b" stroke-width="2"/></svg>'};
+I.c='<svg viewBox="0 0 48 48"><path d="M6 30h36l-6 10H12zM24 8v20M24 10l12 14H24z" fill="none" stroke="#d3e6da" stroke-width="2"/></svg>';I.v='<svg viewBox="0 0 48 48"><rect x="5" y="10" width="38" height="28" fill="#13211c" stroke="#d3e6da" stroke-width="2"/><path d="M20 18l12 6-12 6z" fill="#d3e6da"/></svg>';
+function path(p){return `<div class="path">${p}</div>`}
+function card(k,st,cl){const c=CALL[k];return `<div class="cc"><div class="av">${c.i}</div><div><b>${c.n}</b><small>${c.r} #${c.id}</small><table><tr><td>IP</td><td>${c.ip}</td></tr><tr><td>SECURE</td><td>TRUE</td></tr><tr><td>STATUS</td><td class="${cl}">${st}</td></tr></table></div></div>`}
+const APPS=[["System",[["t","Trash",0],["g","Settings",0],["x","Terminal",0]]],["Software",[["h","HumanDB","oDb"],["c","VesselDB",0],["c","CarDB",0],["c","BankDB",0],["c","KinTree",0,1],["c","GeoMap",0,1],["c","NewsDesk",0,1],["c","AudioLab",0,1],["c","Lamplighter",0,1]]],["Files",[["f","Documents","oDoc"]]]];
+$("#menu").innerHTML=APPS.map(([h,a])=>`<div class="mh">${h}</div><div class="mg">${a.map(([i,n,id,hid])=>`<button class="ai${hid?" none":""}"${id?` id="${id}"`:" disabled"}>${I[i]}<span>${n}</span></button>`).join("")}</div>`).join("");
+$("#icoD").innerHTML=I.f+"<span>Documents</span>";$("#icoP").innerHTML=I.f+"<span>Pier9</span>";$("#icoP").onclick=openPier;$("#icoF").innerHTML=I.f+"<span>Ferry</span>";$("#icoF").onclick=openFerry;
+$("#oDb").onclick=openDb;$("#oDoc").onclick=openDocs;$("#icoD").onclick=openDocs;$("#note").onclick=e=>{if(!e.target.closest("#att"))$("#nb").classList.remove("none")};$("#att").onclick=()=>{got=true;if(wins.doc){wins.doc.el.remove();wins.doc.tab.remove();delete wins.doc}$("#icoD").classList.remove("none");openDocs();openWelcome()};
+$("#desk").addEventListener("click",e=>{if(mode!="sel"||e.target.closest("button,.wh"))return;const f=e.target.closest(".fld")||e.target;const ok=f.dataset.k==cur.ans&&!(f.dataset.k=="plate"&&!enh);
+ const a=$("#obj").getBoundingClientRect(),b=f.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.bottom,bx=b.left+b.width/2,by=b.top,cx=(ax+bx)/2,cy=(ay+by)/2,col=ok?"#6be38f":"#ff6a4a";
+ $("#ln").innerHTML=`<rect x="${b.left-4}" y="${b.top-4}" width="${b.width+8}" height="${b.height+8}" rx="4" fill="none" stroke="${col}" stroke-width="2"/><path pathLength="1" stroke="${col}" d="M${ax} ${ay}V${cy}H${cx}"/><path pathLength="1" stroke="${col}" d="M${bx} ${by}V${cy}H${cx}"/><g style="transform-origin:${cx}px ${cy}px"><circle cx="${cx}" cy="${cy}" r="22" fill="#0c1512" stroke="${col}" stroke-width="3"/><path transform="translate(${cx} ${cy})" stroke="${col}" stroke-width="4" fill="none" style="stroke-dasharray:none;animation:none;stroke-dashoffset:0" d="${ok?"M-9 0L-3 7L10 -8":"M-8 -8L8 8M8 -8L-8 8"}"/></g>`;
+ if(!ok){setTimeout(()=>{$("#ln").innerHTML="";toast(f.dataset.k=="plate"&&!enh?"Too blurry to read. Try Enhance first.":"That doesn't answer the objective.")},1500);return}
+ mode="idle";document.body.classList.remove("selecting");$("#obj").className="done";$("#hint").classList.add("none");const o=cur;cur=null;
+ setTimeout(()=>{$("#ln").innerHTML="";if(!o.msg){o.res();return}const s=$("#side").getBoundingClientRect(),q=$("#obj").getBoundingClientRect(),y=document.createElement("div");y.className="fly";y.textContent=o.msg;y.style.left=q.left+"px";y.style.top=q.top+"px";document.body.appendChild(y);
+  requestAnimationFrame(()=>{y.style.left=s.left+20+"px";y.style.top=s.bottom-70+"px"});setTimeout(()=>{y.remove();reply([o.msg]).then(o.res)},850)},1500)});
+function title(t){const c=$("#card");c.classList.remove("off");c.textContent="";return(async()=>{for(const ch of t){c.textContent+=ch;await sleep(55)}await sleep(1600);c.classList.add("off")})()}
+
+const VES={"PA-4471":{n:"Gannet's Rest",t:"Trawler, 14 m",p:"Port Alder",y:"1981",o:"Harbourline Leasing Ltd",m:"Walter BRENNICK",pp:"Calder Maritime Holdings",e:"09/22/2010 by registry clerk"}};
+function kb(el,hint,rows,fn){let t="";const b=el.querySelector(".wb");b.innerHTML=`<div class="dim">${hint}</div><div id="nm">_</div><div id="kb">${rows.map(r=>`<div class="kb">${[...r].map(c=>`<button data-c="${c}">${c}</button>`).join("")}</div>`).join("")}<div class="kb"><button class="w" data-c=" ">space</button><button class="w" data-c="<">delete</button><button class="w" data-c="=">Search</button></div></div>`;b.querySelector("#kb").onclick=e=>{const c=e.target.dataset.c;if(!c)return;if(c=="<")t=t.slice(0,-1);else if(c=="=")return fn(t.trim());else t+=c;b.querySelector("#nm").textContent=t+"_"}}
+function openVes(){$("#menu").classList.remove("on");openWin("ves","VesselDB",'',480);vs()}
+function vs(){kb(wins.ves.el,"Vessel registry. Type a registration number.",["1234567890-","QWERTYUIOP","ASDFGHJKL","ZXCVBNM"],t=>{const r=VES[t.toUpperCase()];if(!r){toast("No vessel with that registration.");return}const f=(k,l,v,w)=>`<div class="fld${w?" wide":""}" data-k="${k}"><span>${l}</span>${v}</div>`;wins.ves.el.querySelector(".wb").innerHTML=`<div class="nm">${r.n}</div><div class="dim">Registration ${t.toUpperCase()}</div><div class="grid">${f("vt","Type",r.t)}${f("vp","Home port",r.p)}${f("vy","Year built",r.y)}${f("vs","Status","Registered")}${f("owner","Registered owner",r.o,1)}${f("vm","Master",r.m,1)}${f("vparent","Owner is part of",r.pp,1)}${f("vedit","Record last updated",r.e,1)}</div><p><button onclick="vs()">Back to search</button></p>`})}
+function openPier(){const o=openWin("pier","Pier9",path("./O0891/Pier9")+`<div class="fl"><button class="fi" id="fv">${I.v}<span>Dock_cam</span></button></div><div class="sbar dim">0 folder(s) | 1 file(s)</div>`,380);o.el.querySelector("#fv").onclick=openVid}
+function openVid(){const o=openWin("vid","Dock_cam.vid",path("./O0891/Pier9/Dock_cam")+`<div class="vid"><div class="hull"><div class="fld" id="plate" data-k="plate">PA-4471</div></div><div class="ts">PIER 9 / CAM 2 / 00:52:14</div><div class="scan"></div></div><p><button id="enh">Enhance</button> <span class="dim" id="es">Footage degraded.</span></p>`,420),e=o.el,pl=e.querySelector("#plate");if(enh){pl.classList.add("sharp");e.querySelector("#es").textContent="Enhanced."}
+ e.querySelector("#enh").onclick=()=>{if(enh)return;e.querySelector(".vid").classList.add("go");e.querySelector("#es").textContent="Enhancing...";setTimeout(()=>{enh=true;pl.classList.add("sharp");e.querySelector("#es").textContent="Enhanced.";e.querySelector(".vid").classList.remove("go")},1500)}}
+const VEH={"PA-8830":{t:"Panel van, 2007",c:"White",o:"Kestrel Facility Services Ltd",g:"Unit 3, Quay Trading Estate",e:"03/11/2011 by registry clerk"},"NR-0007":{t:"Panel van, 2009",c:"Black",o:"CAS Staffing Ltd",g:"Pier Zero, Northreach Point",e:"01/05/2010 by registry clerk"},"RB-3350":{t:"Saloon, 1998",c:"Green",o:"Teodor BRANDT",g:"12 Marsh Road, Delta Coast",e:"none"},"DC-2291":{t:"Panel van, 2004",c:"Grey",o:"Meridian Cold Storage Ltd",g:"Unit 7, Salt Quay, Delta Coast",e:"06/30/2011 by registry clerk"}};
+function openCar(){$("#menu").classList.remove("on");openWin("car","CarDB",'',480);cs()}
+function cs(){kb(wins.car.el,"Vehicle registry. Type a plate number.",["1234567890-","QWERTYUIOP","ASDFGHJKL","ZXCVBNM"],t=>{const r=VEH[t.toUpperCase()];if(!r){toast("No vehicle with that plate.");return}const f=(k,l,v,w)=>`<div class="fld${w?" wide":""}" data-k="${k}"><span>${l}</span>${v}</div>`;wins.car.el.querySelector(".wb").innerHTML=`<div class="nm">${r.t}</div><div class="dim">Plate ${t.toUpperCase()}</div><div class="grid">${f("ccol","Colour",r.c)}${f("cown","Registered owner",r.o,1)}${f("cgar","Garaged at",r.g,1)}${f("cedit","Record last updated",r.e,1)}</div><p><button onclick="cs()">Back to search</button></p>`})}
+function unlockCar(){const b=[...document.querySelectorAll("#menu .ai")].find(x=>x.textContent=="CarDB");b.disabled=false;b.id="oCar";b.onclick=openCar}
+const BANK={"TEODOR BRANDT":{b:"$48,200",r:"None",a:"None",v:"Calder Meridian pension",p:"None"},"HANNE OSTRAND":{b:"$214",r:"Elin OSTRAND, sister",a:"$12,000 on 03/20/2009",v:"Calder Freight Services",p:"None"},
+"PAVEL LIND":{b:"$96",r:"Mara LIND, wife",a:"$15,000 on 06/18/2009",v:"Calder Insurance Brokers",p:"None"},
+"SORIN DRAY":{b:"$305",r:"Jonas DRAY, brother",a:"$9,500 on 11/05/2010",v:"Calder Harbour Supplies",p:"None"},
+"TESS VANCE":{b:"$41",r:"Alma VANCE, mother",a:"$20,000 on 09/12/2011",v:"Calder Port Services",p:"None"},
+"MARTA KESSLER":{b:"$120",r:"None yet",a:"None",v:"-",p:"$18,000 incoming from Calder Insurance Brokers, due 11/01"}};
+function openBank(){$("#menu").classList.remove("on");openWin("bnk","BankDB",'',500);bs()}
+function bs(){kb(wins.bnk.el,"Account records. Type a full name.",["1234567890-","QWERTYUIOP","ASDFGHJKL","ZXCVBNM"],t=>{const r=BANK[t.toUpperCase()];if(!r){toast("No account found for that name.");return}const f=(k,l,v,w)=>`<div class="fld${w?" wide":""}" data-k="${k}"><span>${l}</span>${v}</div>`;wins.bnk.el.querySelector(".wb").innerHTML=`<div class="nm">${t.toUpperCase()}</div><div class="dim">Savings account</div><div class="grid">${f("bal","Balance",r.b)}${f("pend","Pending",r.p,1)}${f("rcp","Last transfer to",r.r,1)}${f("amt","Amount sent",r.a,1)}${f("via","Routed through",r.v,1)}</div><p><button onclick="bs()">Back to search</button></p>`})}
+function unlockBank(){const b=[...document.querySelectorAll("#menu .ai")].find(x=>x.textContent=="BankDB");b.disabled=false;b.id="oBnk";b.onclick=openBank}
+const TD={KinTree:{hint:"Family records. Type a full name.",recs:{}},GeoMap:{hint:"Geo-map. Pick a location.",btn:1,recs:{}},NewsDesk:{hint:"Newspaper archive. Pick a story.",btn:1,recs:{}},Lamplighter:{hint:"Ask Lamplighter. Pick a question.",btn:1,recs:{}},AudioLab:{hint:"Audio lab. Pick a recording.",btn:1,recs:{}}};
+function addR(n,o){Object.assign(TD[n].recs,o)}
+function showR(n,r){const id="t_"+n;wins[id].el.querySelector(".wb").innerHTML=`<div class="nm">${r.t}</div><div class="dim">${r.s}</div><div class="grid">${r.f.map(([k,l,v,w])=>`<div class="fld${w?" wide":""}" data-k="${k}"><span>${l}</span>${v}</div>`).join("")}</div><p><button onclick="tq('${n}')">Back</button></p>`}
+function tq(n){const T=TD[n],id="t_"+n;if(T.btn){wins[id].el.querySelector(".wb").innerHTML=`<div class="dim">${T.hint}</div><div style="display:flex;flex-direction:column;gap:6px;margin-top:10px">${Object.keys(T.recs).map((k,i)=>`<button data-i="${i}" style="text-align:left">${k}</button>`).join("")}</div>`;wins[id].el.querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>showR(n,T.recs[Object.keys(T.recs)[+b.dataset.i]]));return}
+ kb(wins[id].el,T.hint,["1234567890-","QWERTYUIOP","ASDFGHJKL","ZXCVBNM"],t=>{const r=T.recs[t.toUpperCase()];if(!r){toast("No match found.");return}showR(n,r)})}
+function openT(n){$("#menu").classList.remove("on");openWin("t_"+n,n,'',500);tq(n)}
+function unlockT(n){const b=[...document.querySelectorAll("#menu .ai")].find(x=>x.textContent==n);if(!b)return;b.disabled=false;b.classList.remove("none");b.onclick=()=>openT(n)}
+function ghostOn(){document.body.classList.add("gh");if(!$("#asc")){const p=document.createElement("pre");p.id="asc";p.textContent=Array.from({length:70},(_,i)=>("01 / | \\ . : ; ".repeat(16)).slice(i%9,i%9+220)).join("\n");$("#desk").prepend(p)}}
+const DK=[];
+function renderDesk(){let c=$("#dk");if(!c){c=document.createElement("div");c.id="dk";$("#desk").appendChild(c)}c.innerHTML=DK.map((f,i)=>`<button class="dki${f.nw?" nw":""}" data-i="${i}">${I.f}<span>${f.n}</span></button>`).join("");c.querySelectorAll(".dki").forEach(b=>b.onclick=()=>openFolder(DK[+b.dataset.i]))}
+function desk(n,files){let f=DK.find(x=>x.n==n);if(!f){f={n,files:[...files],nw:1};DK.push(f)}else files.forEach(k=>{if(!f.files.includes(k)){f.files.push(k);f.nw=1}});renderDesk();if(f.nw&&wins["f_"+n]){fillF(f)}}
+function addF(n,k){desk(n,[k]);toast("New file in "+n+": "+FV[k][0])}
+function fHTML(f){return path("./O0891/"+f.n)+`<div class="fl">${f.files.map(k=>`<button class="fi" data-k="${k}">${k=="dock"?I.v:I.d}<span>${FV[k][0].split(".")[0]}</span></button>`).join("")}</div><div class="sbar dim">0 folder(s) | ${f.files.length} file(s)</div>`}
+function bindF(el){el.querySelectorAll(".fi").forEach(b=>b.onclick=()=>b.dataset.k=="dock"?openVid():openFv(b.dataset.k))}
+function fillF(f){const w=wins["f_"+f.n];if(!w)return;w.el.querySelector(".wb").innerHTML=fHTML(f);bindF(w.el)}
+function openFolder(f){f.nw=0;renderDesk();const o=openWin("f_"+f.n,f.n,fHTML(f),380);bindF(o.el)}
+const FOLD=[[2,"Pier9",["dock"]],[3,"Ferry",["test","tick","phone","sim"]],[4,"Dockside",["lpage","cor"]],[5,"Tip",["tip","carr","stash"]],[8,"Fire",["fire","gate"]],[10,"Badge",["badge"]],[11,"Traces",["alog","trace"]],[12,"Ghost",["gtools","gsess","gman","gtape"]],[13,"Calloway",["cphone","ctip"]],[14,"Search",["cctv"]],[16,"Orders",["order","door"]],[17,"Marsh",["foot","inv","aud"]]];
+function folder(n,keys,note){FN=n;FS=keys;$("#icoF").innerHTML=I.f+"<span>"+n+"</span>";$("#icoF").classList.remove("none");if(note)mark("File received: "+n)}
+async function done(n,next){await sleep(5000);const c=$("#card");c.classList.remove("off");c.textContent="MISSION "+n+" COMPLETE";await sleep(3500);await next()}
+function unlockVes(){const b=[...document.querySelectorAll("#menu .ai")].find(x=>x.textContent=="VesselDB");b.disabled=false;b.id="oVes";b.onclick=openVes}
+function reset(){{const _m=SV.get();FOLD.forEach(([m,n,f])=>{if(m<_m){desk(n,f);const d=DK.find(x=>x.n==n);if(d&&!d.seen){d.nw=0;d.seen=1}}});renderDesk()}const _n=SV.get();if(_n>=2)unlockVes();if(_n>=5)unlockCar();if(_n>=6)unlockBank();if(_n>=7){unlockT("KinTree");unlockT("GeoMap")}if(_n>=8)unlockT("NewsDesk");if(_n>=9)unlockT("Lamplighter");if(_n>=14)unlockT("AudioLab");document.body.classList.remove("gh");const _a=$("#asc");if(_a)_a.remove();for(const id in wins){wins[id].el.remove();wins[id].tab.remove();delete wins[id]}$("#reps").innerHTML="";$("#menu").classList.remove("on")}
+async function m2(){SV.set(2);
+ reset();clock[0]=1;clock[1]=10;
+ await title("Special Intelligence Network\nNight Desk, 01:10");unlockVes();
+ await sleep(4000);await ring("d");
+ await say("Operator. Dov again.");
+ await say("Someone emptied a warehouse on Pier 9 tonight. Forty crates, gone.");
+ await say("A dock camera caught the boat. I'm sending you the footage.");
+ await ask([["Send it over.",["Sending now."]],["Anything else on the boat?",["Not yet. That's why I'm calling you."]]]);
+ desk("Pier9",["dock"]);mark("File received: Pier9");
+ await say("Open Pier9 on your desktop. The boat's registration is blurred.");
+ await say("Enhance the footage, then click the objective and pick the registration.");
+ await objective({text:"Read the boat's registration",ans:"plate",hint:"Open Pier9, then Dock_cam. Press Enhance, then click the objective and the plate.",msg:"The registration reads PA-4471."});
+ await say("PA-4471. Good eyes. You haven't lost your touch.");
+ await say("VesselDB is in your Applications menu now. I need the registered owner.");
+ await objective({text:"Find the owner of PA-4471",ans:"owner",hint:"Applications, VesselDB, type PA-4471, then click the registered owner.",msg:"Registered owner: Harbourline Leasing Ltd."});
+ await say("A leasing company. Never heard of it. The record names a master too, Walter Brennick.");
+ await say("That's the grey beard on the tape. Where does he live?");
+ await objective({text:"Find Walter BRENNICK's address",ans:"addr",hint:"HumanDB, search WALTER BRENNICK, then click the address.",msg:"Brennick lives at 3 Cannery Steps, Port Alder."});
+ await say("Cannery Steps. Ten minutes from the pier. I'll send a car.");
+ await say("But a fisherman doesn't lease a trawler from a company with a nice letterhead. Who's behind Harbourline?");
+ await objective({text:"Find who owns Harbourline Leasing",ans:"vparent",hint:"Open the VesselDB record again and read the line below the owner.",msg:"Harbourline belongs to Calder Maritime Holdings."});
+ await sleep(1500);await say("Calder. That name is on half the cranes in this harbour.");
+ await ask([["Big family, big port.",["True. Still, it's odd."]],["Want me to dig further?",["No. Not tonight. Just log it."]]]);
+ await say("One more thing. The night watchman found a crate the thieves dropped. It's full of brass bells.");
+ await say("Forty crates of bells. Who steals bells?");
+ await say("Thanks, Operator. I'm going to Cannery Steps.");
+ await reply(["Stay careful, Dov.","Understood."]);mark("Call ended");
+ await sleep(1500);join("m","Supervisor back on the line");
+ await say("Aldous briefed me. Calder is not a name we pull at one in the morning.");
+ await say("Write it in the log exactly as it appears, and nothing more. I'll take it from here.");
+ await reply(["Understood.","Yes, ma'am."]);mark("Call ended");
+ await sleep(5000);const c=$("#card");c.classList.remove("off");c.textContent="MISSION 2 COMPLETE";await sleep(3500);await m3()}
+
+const FV={test:["Testimony.txt","Statement of Ana VOSS, given 10/21, 09:00",[["t1","Home by","10:30 PM"],["t2","Night","Stayed in. Did not leave Port Alder."],["t3","Seen by","No one, she says"]]],
+tick:["Ticket.scan","Port Alder Ferry Co.",[["tname","Passenger","A. VOSS"],["troute","Route","Port Alder to Saltmarsh"],["tdate","Date","10/20"],["tbuy","Purchased","10/19, cash"],["tdep","Departed","22:45"]]],
+phone:["Phone_Log.txt","Carrier log, A. VOSS, 10/20 to 10/21",[["p1","10/20 22:12","Tower 4, Port Alder"],["p2","10/20 22:51","Tower 9, Ferry Channel"],["p3","10/20 23:20","Tower 12, Saltmarsh"],["p5","10/21 07:52","Incoming call from a prepaid number, 4 min"]]],
+sim:["Sim_Trace.txt","Carrier note, prepaid number ending 0417",[["s1","Type","Prepaid SIM, no registration"],["sbuy","Sold","10/19, Quay Kiosk, Saltmarsh"],["s3","Payment","Cash"]]],
+lpage:["Ledger_Page.scan","Page 41, torn from a dock ledger. A pencilled mark of three rings in the corner.",[["lo","03/2009","Hanne OSTRAND, struck out"],["lp","06/2009","Pavel LIND, struck out"],["lk","02/2010","Marta KESSLER, circled"],["ld","11/2010","Sorin DRAY, struck out"],["lv","09/2011","Tess VANCE, struck out"]]],
+cor:["Coroner.txt","Coroner note, Emil RASK, dockworker, age 52",[["cfound","Found","10/22, 06:10, Pier 9"],["cdeath","Time of death","Between 01:00 and 03:00"],["ccause","Cause","Drowning, ruled accidental"],["cnote","Effects","Ledger page in his boot"]]]};
+FV.tip=["Tip.txt","Anonymous tip, taken by Agent Calloway, 10/24, 21:40",[["tn1","Caller","Calls himself Mr. Lamb"],["tplate","Vehicle","Grey van, plate DC-2291"],["tn3","Seen","Loading crates, Pier 9 side, after 01:00"],["tn4","He said","Look in the unit by the water."]]];
+FV.carr=["Carrier.txt","Carrier note, the incoming tip call",[["cl1","Origin","Payphone, Quay Street, Saltmarsh"],["cl2","Length","3 min 12 s"],["ctone","Line","A faint low tone under the voice"],["cl4","Voice","Male, calm, older"]]];
+FV.stash=["Stash.txt","Field report, Agent Calloway, Unit 7, Salt Quay",[["ccount","Crates","40 of 40"],["scont","Contents","Brass bells, wrapped in cloth"],["slock","Lock","Opened with a key left on the sill"]]];
+FV.dock=["Dock_cam.vid"];
+FV.fire=["Fire.txt","Fire service report, Pier 4 warehouse, Southmarch",[["fstart","Started","02:40"],["fcause","Cause","Accelerant at the back door"],["fsite","Site","Pier 4 warehouse"]]];
+FV.gate=["Gate.txt","Gate camera, Pier 4",[["gplate","Plate seen leaving","PA-8830"],["gtime","Time","02:51"],["gnote","Note","One person, driving, no hurry"]]];
+FV.badge=["Badge.txt","Photo of a badge found in a crate, Unit 7",[["bnum","Badge number","CT-5521"],["biss","Issued by","CAS Staffing Ltd"],["bsite","Site code","PZ-1"]]];
+FV.alog=["Access.log","Network access log, last night",[["lt","Outside entry","03:12, through a maintenance door"],["lfrom","Door created","2009, at Terminal 14 (this desk)"],["lcnt","Files opened","Eleven. None changed."]]];
+FV.trace=["Traces.dir","Files left behind by the intruder",[["t1","access_map.tmp","Deletable"],["t2","cache_0312.tmp","Deletable"],["gfile","ghost_mode.sys","Cannot be deleted. In use."]]];
+FV.gtools=["Tools.txt","Ghost folder: tool list",[["g1","HumanDB","Listed, logged"],["g2","Lamplighter","Listed, logged"],["gent","Ghost entry","Unlisted. Hidden from the Network audit.",1]]];
+FV.gsess=["Session.txt","Ghost folder: session",[["gvis","Visible to supervisor","NO. Hidden. You only.",1]]];
+FV.gman=["Manifest.txt","OIS manifest, Pier Zero",[["gm1","Facility","Pier Zero, Northreach Point"],["gm2","Staff","61 contractors, CAS Staffing"],["gm3","Level","Level minus 2, on no map",1]]];
+FV.gtape=["Tape.txt","Ghost folder: recording",[["gtape","File","Brandt_0417.aud, 4 min 12 s"],["gfrom","Left by","The user who built this door",1]]];
+FV.cphone=["Phone_Log.txt","Calloway's phone",[["cl1","21:30","Tower 7, Salt Quay"],["clast","21:58, last ping","Tower 18, Gull Point"],["cl3","22:10","Phone off"]]];
+FV.ctip=["Tip.txt","Mr. Lamb's last tip, 18:40",[["ct1","Caller","Mr. Lamb"],["ctaddr","He said","Come alone. Gull Point Cannery, dock 3, tonight.",1]]];
+FV.cctv=["Quay_Street.txt","Camera, Quay Street payphone, 10/24 21:35",[["vplate","Car plate","RB-3350"],["vwho","Seen","A man in a grey coat at the payphone"]]];
+FV.order=["Order.txt","Cleaning order, relayed by I. Maddox",[["oto","To","Kestrel Facility Services"],["owhen","When","02:00 tonight"],["owhere","Where","12 Marsh Road, Delta Coast",1],["osign","Authorised","OIS liaison, passed down by Maddox",1]]];
+FV.door=["Door.txt","Ghost folder: door file",[["dnum","Brandt's line","0417 2290"],["dnote","Note","Left open for you",1]]];
+FV.foot=["Street_cam.txt","Camera, Marsh Road, 02:07",[["fppl","People who entered","Four, in grey overalls"],["fvan","Van plate","PA-8830"],["fout","Left","The four, after 41 minutes"]]];
+FV.inv=["Invoice.txt","Cleaning invoice, Kestrel Facility Services",[["iline","Invoice line","Cleaning, 12 Marsh Road, 02:00. Billed to CAS Staffing, charged on to Calder Maritime Holdings.",1]]];
+FV.aud=["Audit.txt","SIN Audit note",[["aghost","Ghost session","Seen by SIN Audit, 03:11. Never hidden.",1]]];
+let FS=["test","tick","phone","sim"],FN="Ferry";
+function openFv(k){const [t,h,rows]=FV[k];openWin(k,t,path("./O0891/"+((DK.find(f=>f.files.includes(k))||{n:"Ferry"}).n)+"/"+t.split(".")[0])+`<p><b>${h}</b></p><div class="grid">${rows.map(([a,b,c])=>`<div class="fld wide" data-k="${a}"><span>${b}</span>${c}</div>`).join("")}</div>`,400)}
+function openFerry(){const o=openWin("ferry",FN,path("./O0891/"+FN)+`<div class="fl">${FS.map(k=>`<button class="fi" data-k="${k}">${I.d}<span>${FV[k][0].split(".")[0]}</span></button>`).join("")}</div><div class="sbar dim">0 folder(s) | ${FS.length} file(s)</div>`,380);o.el.querySelectorAll(".fi").forEach(b=>b.onclick=()=>openFv(b.dataset.k))}
+async function m3(){SV.set(3);
+ reset();clock[0]=2;clock[1]=35;
+ await title("Special Intelligence Network\nNight Desk, 02:35");
+ await sleep(4000);await ring("r");
+ await say("Hello. Operator? Agent Calloway. Rhea.");
+ await say("This is my first case. Sorry. I was told you're patient.");
+ await ask([["Take your time, Agent.",["Thank you. Okay. Breathe."]],["What's the case?",["Right. The case. Yes."]]]);
+ await say("A man vanished from Port Alder two nights ago. His neighbour, Ana Voss, says she was home all night and saw nothing.");
+ await say("Her statement felt rehearsed. I'm sending her statement, a ferry ticket from her coat, her phone log and a carrier note.");
+ desk("Ferry",["test","tick","phone","sim"]);mark("File received: Ferry");
+ await say("Open the Ferry folder. Compare everything. Find what doesn't fit her story.");
+ await objective({text:"Find what contradicts Voss's statement",ans:"tdep",hint:"Open Ferry. Read Testimony, then Ticket. Click the objective, then the detail that contradicts her.",msg:"Her ticket shows a 22:45 departure. She said she was home by 22:30."});
+ await say("The 22:45 ferry. She told me she never left Port Alder.");
+ await say("So where did she go? Can the phone log tell us?");
+ await objective({text:"Where was her phone at 23:20?",ans:"p3",hint:"Open Phone_Log, click the objective, then the 23:20 entry.",msg:"Her phone pinged a Saltmarsh tower at 23:20."});
+ await say("Saltmarsh. That's forty minutes by water.");
+ await say("She gave the statement at nine yesterday morning, word for word, like she'd practised. Did anyone call her before that?");
+ await objective({text:"Find the call she received before her statement",ans:"p5",hint:"Phone_Log. Look at the last entry, the morning of the statement.",msg:"She got a four minute call from a prepaid number at 07:52."});
+ await say("Prepaid. No name on it. The carrier note should say more. Where was that SIM sold?");
+ await objective({text:"Where was the prepaid SIM sold?",ans:"sbuy",hint:"Open Sim_Trace and click where and when it was sold.",msg:"The SIM was sold on 10/19 at Quay Kiosk, Saltmarsh."});
+ await say("Saltmarsh again. And 10/19. Now compare that date with something else in her file.");
+ await objective({text:"Match the SIM sale to her ticket",ans:"tbuy",hint:"Ticket.scan has a purchase date. Click it.",msg:"Her ticket was bought the same day, 10/19, in cash."});
+ await sleep(1500);await say("The same day. Someone bought a phone and her ferry ticket, and told her what to say.");
+ await ask([["A stranger coached her.",["Yes. Quietly, three days ahead of the police."]],["Or she did it all herself.",["She doesn't strike me as that careful."]]]);
+ await say("I don't know who yet. Thank you, Operator. I'll keep her talking.");
+ await reply(["Be careful, Agent.","Good luck."]);mark("Call ended");
+ await sleep(1500);join("m","Supervisor back on the line");
+ await say("Calloway briefed me. Witness coached, prepaid SIM, cash ticket. Clean work.");
+ await say("Write it up exactly as the records show, Operator. Nothing more.");
+ await reply(["Understood.","Yes, ma'am."]);mark("Call ended");
+ await sleep(5000);const c=$("#card");c.classList.remove("off");c.textContent="MISSION 3 COMPLETE";await sleep(3500);await m4()}
+
+const SV={get(){try{return+localStorage.getItem("nd")||0}catch(e){return 0}},set(n){try{localStorage.setItem("nd",n)}catch(e){}}};
+function menu(n){return new Promise(res=>{const M=$("#mm");M.classList.remove("off");$("#mmemb").innerHTML=$("#seal").outerHTML.replace('id="seal"','class="lgs"').replace('id="rp"','id="rp3"').replace('href="#rp"','href="#rp3"');
+ $("#mmc").textContent="Continue (Mission "+n+")";
+ $("#mmc").onclick=()=>{M.classList.add("off");res(n)};
+ $("#mmn").onclick=()=>{SV.set(1);M.classList.add("off");res(1)};
+ $("#mmk").onclick=()=>{$("#mmb").classList.add("none");$("#cr2").classList.remove("none")};
+ $("#mmx").onclick=()=>{$("#cr2").classList.add("none");$("#mmb").classList.remove("none")}})}
+function tbar(){const c=SV.get();$("#tst").innerHTML="<b>TESTER</b>"+Array.from({length:17},(_,i)=>`<button data-n="${i+1}" class="${i+1==c?"cu":""}">${i+1}</button>`).join("");$("#tst").onclick=e=>{const n=+e.target.dataset.n;if(!n)return;SV.set(n);try{localStorage.setItem("ndj",n)}catch(x){}location.reload()}}
+async function boot(){tbar();let j=0;try{j=+localStorage.getItem("ndj")||0;localStorage.removeItem("ndj")}catch(x){}if(j>=1&&j<=17){$("#mm").classList.add("off");await [0,m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14,m15,m16,m17][j]();return}const n=SV.get();const k=n>=1&&n<=17?await menu(n):1;await [0,m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14,m15,m16,m17][k]()}
+function typeIn(el,t,mask){return(async()=>{el.textContent="";for(const c of t){el.textContent+=mask?"*":c;await sleep(80)}})()}
+function login(){return new Promise(res=>{const L=$("#login");L.classList.remove("off");$("#lgemb").innerHTML=$("#seal").outerHTML.replace('id="seal"','class="lgs"').replace('id="rp"','id="rp2"').replace('href="#rp"','href="#rp2"');let u=0,p=0;
+ const chk=()=>{if(u==2&&p==2)$("#lgo").disabled=false};
+ $("#lu").onclick=async()=>{if(u)return;u=1;await typeIn($("#lu"),"O-0891");u=2;chk()};
+ $("#lp").onclick=async()=>{if(p)return;p=1;await typeIn($("#lp"),"x".repeat(10),1);p=2;chk()};
+ $("#lgo").onclick=()=>{L.classList.add("off");res()}})}
+let nr;const noteRead=new Promise(r=>nr=r);
+function openTrash(){$("#menu").classList.remove("on");const o=openWin("trash","Trash",path("./O0891/Trash")+`<div class="fld wide" data-k="tf2"><span>Deleted 28 OCT</span>supply_order.txt <button data-o="2" style="float:right">Open</button></div><div class="fld wide" data-k="tf1"><span>Deleted 04 MAR 03:12, by O-0412</span>for_the_next_operator.txt <button data-o="1" style="float:right">Open</button></div><div class="sbar dim">0 folder(s) | 2 file(s)</div>`,440);o.el.querySelectorAll("button[data-o]").forEach(b=>b.onclick=()=>b.dataset.o=="1"?openNote():openWin("sup","supply_order.txt",path("./O0891/Trash/supply_order")+"<p>12 reams of paper. 4 ribbons. 1 desk lamp.</p>",360))}
+function openNote(){openWin("note","for_the_next_operator.txt",path("./O0891/Trash/for_the_next_operator")+`<p>To whoever sits here next.</p><p>They gave me this desk, then took my name out of the system. I think they edit people out, one record at a time.</p><p>The stamps don't lie. Look up your own name. Operator O-0891.</p><p>&mdash; O-0412</p>`,420);nr()}
+function unlockTrash(){const b=[...document.querySelectorAll("#menu .ai")].find(x=>x.textContent=="Trash");b.disabled=false;b.id="oTr";b.onclick=openTrash}
+async function m4(){SV.set(4);
+ reset();clock[0]=3;clock[1]=12;
+ await title("Special Intelligence Network\nNight Desk, 03:12");
+ await sleep(4000);await ring("d");
+ await say("Operator. Dov. Sorry about the hour.");
+ await say("A dockworker named Emil Rask washed up at Pier 9 this morning. The coroner says he drowned. An accident.");
+ await say("The same pier from the boat theft. I don't like it. I'm sending you the coroner's note and a page I found in his boot.");
+ desk("Dockside",["lpage","cor"]);mark("File received: Dockside");
+ await ask([["Send it over.",["Sent. Look at the note first."]],["You think it's connected?",["I think I'm tired and suspicious. Look at the note first."]]]);
+ await say("Open Dockside. When did he die? Click the objective, then the time.");
+ await objective({text:"Find Rask's time of death",ans:"cdeath",hint:"Open Dockside, then Coroner. Click the objective, then the time of death.",msg:"Time of death: between 01:00 and 03:00."});
+ await say("One to three. The theft was at ten past one. Same pier.");
+ await say("Now the page. It's a torn ledger sheet: five names, a date beside each, and a mark in the corner. Is any name familiar?");
+ await objective({text:"Which name on the page is already in your records tonight?",ans:"lk",hint:"Open Ledger_Page. Click the objective, then the name you've already looked up this week.",msg:"Marta Kessler is on the page. She is circled, the others are struck out."});
+ await say("Kessler? Our witness from the first night? Circled, and the rest crossed out.");
+ await say("Check the others. Start with Hanne Ostrand. When was her record created?");
+ await objective({text:"When was OSTRAND's record created?",ans:"edit",hint:"HumanDB, search HANNE OSTRAND, then click the created line.",msg:"Ostrand's record was created 02/14/2009. Never updated."});
+ await say("Same date as Kessler's. Look at Sorin Dray. What does his record say about him?");
+ await objective({text:"What is DRAY's status?",ans:"status",hint:"HumanDB, search SORIN DRAY, then click his status.",msg:"Sorin Dray is listed as missing."});
+ await say("Missing. And the page has him struck out.");
+ await say("Last one. Tess Vance. Same question.");
+ await objective({text:"When was VANCE's record created?",ans:"edit",hint:"HumanDB, search TESS VANCE, then click the created line.",msg:"Vance too: created 02/14/2009. All five files, the same day."});
+ await sleep(1800);await say("Five people. Four missing, one still alive. All five files made on one day, then never touched.");
+ await ask([["Someone picked them.",["Someone who wanted nobody to ask."]],["Could be a data migration.",["Four of them vanished, Operator."]]]);
+ await say("I'm sending a car to Kessler's address now. Thank you. Don't tell anyone yet.");
+ await reply(["Understood, Dov.","Go. Be careful."]);mark("Call ended");
+ await sleep(1500);join("m","Supervisor back on the line");
+ await say("Aldous has been in touch. I heard.");
+ await say("Operator. Drop it. Delete nothing, search nothing more, and write nothing about those five names.");
+ await ask([["Why, ma'am?",["Because I'm asking nicely. Once."]],["Understood.",["Good. Go home."]]]);
+ await say("Go home. I'll see you tomorrow night.");await reply(["Yes, ma'am.","Goodnight."]);mark("Call ended");
+ await sleep(5000);const c=$("#card");c.classList.remove("off");c.textContent="MISSION 4 COMPLETE";await sleep(3500);await m5()}
+
+async function m5(){SV.set(5);
+ reset();clock[0]=23;clock[1]=30;
+ await title("Special Intelligence Network\nNight Desk, 23:30\nTwo nights later");unlockCar();
+ await sleep(4000);await ring("r");
+ await say("Operator? Rhea Calloway. I took over Dov's overflow. He's sitting on a witness.");
+ await say("I have a tip. A real one. A man called my line two nights ago, very polite, and gave me a van and a place.");
+ await say("He calls himself Mr. Lamb. I'm sending you the tip and the carrier note.");
+ desk("Tip",["tip","carr"]);mark("File received: Tip");
+ await ask([["Is Kessler safe?",["Dov says so. A hotel, two officers. Now, the van."]],["Send it over.",["Sending now. Start with the tip."]]]);
+ await say("Open Tip. Read it. What's the van's plate?");
+ await objective({text:"Find the van's plate in the tip",ans:"tplate",hint:"Open Tip, then Tip.txt. Click the objective, then the plate.",msg:"The tip gives a grey van, plate DC-2291."});
+ await say("DC-2291. CarDB is in your Applications menu now. Where is it kept?");
+ await objective({text:"Where is the van garaged?",ans:"cgar",hint:"Applications, CarDB, type DC-2291, then click where it is garaged.",msg:"DC-2291 is garaged at Unit 7, Salt Quay, Delta Coast."});
+ await say("Unit 7, Salt Quay. Mr. Lamb said a unit by the water. That fits.");
+ await say("I'm going in with two officers. Stay on the line.");
+ await sleep(2500);addF("Tip","stash");
+ await say("We're in. Forty crates, and the van's outside. I'm sending my field report.");
+ mark("File received: Stash");
+ await say("Check the report. How many crates did we find? The stolen list says forty.");
+ await objective({text:"Confirm the crate count",ans:"ccount",hint:"Open Tip, then Stash. Click the objective, then the crate count.",msg:"Forty out of forty. Every crate is here."});
+ await say("All of them. Brass bells. Forty crates of brass bells.");
+ await say("The case is closed, Operator. All because of Mr. Lamb.");
+ await ask([["He's helpful.",["Isn't he? I trust him. Nobody else gave me anything."]],["Don't trust a voice.",["I trust results. He gave me the whole case."]]]);
+ await say("He left a key on the sill. Somebody wanted us to find this. Will you check the call once more? Anything odd on the line?");
+ await objective({text:"Is anything odd about the call line?",ans:"ctone",hint:"Open Tip, then Carrier. Click the objective, then the line detail.",msg:"A faint low tone runs under his voice, like a bell."});
+ await sleep(1800);await say("A bell. Like the crates. Probably an old phone box.");
+ await say("Thanks, Operator. I'll see you tomorrow night.");await reply(["Be careful trusting him.","Goodnight, Agent."]);mark("Call ended");
+ await sleep(1500);join("m","Supervisor back on the line");
+ await say("Calloway's tipster again. I'm glad the goods are back. I do not like a stranger who knows where everything is.");
+ await say("Log the payphone. Log the tone. Say nothing to Calloway.");await reply(["Yes, ma'am.","Understood."]);mark("Call ended");
+ await sleep(5000);const c=$("#card");c.classList.remove("off");c.textContent="MISSION 5 COMPLETE";await sleep(3500);await m6()}
+
+async function m6(){SV.set(6);
+ reset();clock[0]=0;clock[1]=48;
+ await title("Special Intelligence Network\nNight Desk, 00:48\nOne week later");unlockBank();
+ await sleep(4000);await ring("d");
+ await say("Operator. Dov. I know what Maddox said. I'm asking anyway. Say no and I'll hang up.");
+ await ask([["Go ahead.",["Thank you. Quietly, then."]],["You're putting me at risk.",["Yes. And I'm sorry. Quietly, then."]]]);
+ await say("Five names from the ledger page. I want to know how they lived. BankDB is in your Applications menu now.");
+ await say("Hanne Ostrand first. What was she worth the month she vanished?");
+ await objective({text:"Find OSTRAND's balance",ans:"bal",hint:"Applications, BankDB, type HANNE OSTRAND, then click the balance.",msg:"Ostrand's balance was only $214."});
+ await say("Two hundred. A woman with no job, no savings. Did any money leave her account?");
+ await objective({text:"Who received money from OSTRAND's account?",ans:"rcp",hint:"Open her BankDB record again and click the recipient.",msg:"Her sister, Elin Ostrand, received $12,000."});
+ await say("Twelve thousand to the sister. From two hundred dollars. How?");
+ await say("Check Pavel Lind. How much did he send, and when?");
+ await objective({text:"How much did LIND send?",ans:"amt",hint:"BankDB, type PAVEL LIND, then click the amount sent.",msg:"Lind sent $15,000 on 06/18/2009, to his wife."});
+ await say("The month he disappeared. His wife got a gift. Check Tess Vance. Who routed her transfer?");
+ await objective({text:"Which company routed VANCE's transfer?",ans:"via",hint:"BankDB, type TESS VANCE, then click who routed it.",msg:"Vance's transfer was routed through Calder Port Services."});
+ await sleep(1500);await say("Calder again. Ostrand's came through Calder Freight, Lind's through Calder Insurance. Every relative was paid by Calder.");
+ await ask([["They were paid to vanish.",["Or paid to keep quiet. Or both."]],["Could be compensation.",["For four people who aren't here to collect it?"]]]);
+ await say("One more. Marta Kessler. Is anything coming to her?");
+ await objective({text:"Is any money pending for KESSLER?",ans:"pend",hint:"BankDB, type MARTA KESSLER, then click the pending line.",msg:"Yes. $18,000 is due on 11/01 from Calder Insurance Brokers."});
+ await sleep(1800);await say("Eighteen thousand, due next week, from the same broker. She's next.");
+ await say("Thank you, Operator. I'm moving her tonight. Not a word.");await reply(["Move her now, Dov.","Understood. Be careful."]);mark("Call ended");
+ await sleep(1500);join("m","Supervisor back on the line");
+ await say("Operator. Five BankDB lookups on five closed names. The system logs everything, and so do I.");
+ await say("I am not going to stop you. I am telling you to be very careful who you tell.");await reply(["Yes, ma'am.","Understood."]);mark("Call ended");
+ await done(6,m7)}
+async function m7(){SV.set(7);
+ reset();clock[0]=23;clock[1]=5;
+ await title("Special Intelligence Network\nNight Desk, 23:05\nA week later");unlockT("KinTree");unlockT("GeoMap");
+ addR("KinTree",{"MARCUS CALDER":{t:"Marcus CALDER",s:"Family tree",f:[["kfa","Father","Alaric CALDER"],["kmo","Mother","Edith HALE-CALDER"],["kcousin","Cousin, runs a Calder firm","Lucan HALE, Calder Insurance Brokers",1],["ksib","Siblings","None"]]},"LUCAN HALE":{t:"Lucan HALE",s:"Family tree",f:[["kmo2","Mother","Ruth HALE"],["kaunt","Aunt","Edith HALE-CALDER"],["kseat","Family seat","Greywater House",1]]}});
+ addR("GeoMap",{"Greywater House":{t:"Greywater House",s:"Eastreach, parcel record",f:[["gestate","Estate name","Greywater, 400 acres",1],["gown","Held by","Greywater Trust",1],["gnear","Within 3 km","Pavel LIND's last known address, 2 Ropewalk",1],["gnear2","Also within 3 km","Ostrand's last employer, Mill Row Dairy",1]]}});
+ await sleep(4000);await ring("r");
+ await say("Operator. It's Rhea. Mr. Lamb called again.");
+ await say("He says the broker that paid the families is run by a Calder cousin. He says you'll find the rest yourself.");
+ await ask([["Still trust him?",["He's been right three times. Yes."]],["What does he want?",["Nothing. That's what bothers me."]]]);
+ await say("KinTree is new. It holds family trees. Start with Marcus Calder. Who is his cousin at the broker?");
+ await objective({text:"Find Marcus CALDER's cousin at the broker",ans:"kcousin",hint:"Applications, KinTree, type MARCUS CALDER, then click the cousin.",msg:"His cousin is Lucan Hale, of Calder Insurance Brokers."});
+ await say("Lucan Hale. Where does he live?");
+ await objective({text:"Find Lucan HALE's address",ans:"addr",hint:"Applications, HumanDB, type LUCAN HALE, then click the address.",msg:"Hale lives at Greywater House, Eastreach."});
+ await say("GeoMap is new too. Look up Greywater House. What kind of place is it?");
+ await objective({text:"Find the estate's name on the GeoMap",ans:"gestate",hint:"Applications, GeoMap, pick Greywater House, then click the estate name.",msg:"It is part of the Greywater estate, 400 acres."});
+ await say("Four hundred acres. Anything else nearby from our files?");
+ await objective({text:"Which vanished person lived within 3 km?",ans:"gnear",hint:"Open the GeoMap record again and click the nearby entry.",msg:"Pavel Lind's last known address is within 3 km."});
+ await sleep(1500);await say("Lind. And Ostrand's old job too. The same estate in three files that had nothing in common.");
+ await ask([["A meeting place?",["Or a place where people are handed over."]],["Coincidence?",["I stopped using that word this month."]]]);
+ await say("Thank you, Operator. I'm going to watch it.");await reply(["Don't go alone.","Be careful, Rhea."]);mark("Call ended");
+ await done(7,m8)}
+async function m8(){SV.set(8);
+ reset();clock[0]=3;clock[1]=2;
+ await title("Special Intelligence Network\nNight Desk, 03:02\nThat week");unlockT("NewsDesk");
+ addR("NewsDesk",{"Pier 4 fire, this morning":{t:"Southmarch Courier",s:"Pier 4 warehouse fire",f:[["nword","The paper's wording","An unfortunate accident. No foul play suspected.",1]]},"Fires at Mill Row and Quay Street":{t:"Southmarch Courier archive",s:"2009 and 2010",f:[["ncount","Same wording used","Twice before: 2009 and 2010",1],["nsrc","Wire source","Unsigned notice, same agency",1]]}});
+  await sleep(4000);await ring("o");
+ await say("Operator? Detective Sam Okoro, city police. SIN gave me your line.");
+ await say("A warehouse burned on Pier 4 tonight. My fire chief says arson. My captain says accident.");
+ await say("I'm sending the fire report and the gate camera.");
+ desk("Fire",["fire","gate"]);mark("File received: Fire");
+ await ask([["Send them over.",["Sending. The report first."]],["Why call SIN?",["I need records I can't touch. You can."]]]);
+ await say("When did the fire start?");
+ await objective({text:"Find when the fire started",ans:"fstart",hint:"Open Fire, then Fire.txt. Click the objective, then the start time.",msg:"The fire started at 02:40."});
+ await say("Ten minutes later a vehicle left the gate. What's the plate?");
+ await objective({text:"Read the plate on the gate camera",ans:"gplate",hint:"Open Fire, then Gate. Click the objective, then the plate.",msg:"The plate is PA-8830."});
+ await say("Who owns that van?");
+ await objective({text:"Find who owns PA-8830",ans:"cown",hint:"Applications, CarDB, type PA-8830, then click the owner.",msg:"It belongs to Kestrel Facility Services Ltd."});
+ await say("A cleaning company. At two in the morning. They'll say they were hired to clean up after the fire, I suppose.");
+ await say("The paper already has it. Have you seen the wording? Check the Courier.");
+ await objective({text:"Find the paper's wording about the fire",ans:"nword",hint:"Applications, NewsDesk, pick the Pier 4 story, then click the wording.",msg:"The paper calls it an unfortunate accident, no foul play suspected."});
+ await say("Before the fire chief even finished. Has the Courier used those words before?");
+ await objective({text:"How many earlier fires used the same wording?",ans:"ncount",hint:"NewsDesk, pick the Mill Row and Quay Street story, then click the count.",msg:"Twice before: in 2009 and 2010. Same wording, same source."});
+ await sleep(1500);await say("Three fires, three years, the same sentence. Someone writes the sentence before the fire.");
+ await say("Thank you, Operator. I'll take it to my captain. He won't like it.");await reply(["Be careful, Detective.","Good luck."]);mark("Call ended");
+ await sleep(1500);join("m","Supervisor back on the line");
+ await say("A police detective with your extension. I don't remember approving that.");
+ await say("Keep helping if it's legitimate. Keep the log clean.");await reply(["Yes, ma'am.","Understood."]);mark("Call ended");
+ await done(8,m9)}
+async function m9(){SV.set(9);
+ reset();clock[0]=23;clock[1]=40;
+ await title("Special Intelligence Network\nNight Desk, 23:40\nAct three");unlockT("Lamplighter");
+ addR("Lamplighter",{"Who owns Harbourline Leasing?":{t:"Lamplighter",s:"Answered in 0.4 s",f:[["l1","Answer","Harbourline Leasing is wholly owned by Calder Maritime Holdings.",1]]},"What was SIN's drought relief in 2000?":{t:"Lamplighter",s:"Answered in 0.6 s",f:[["l4","Answer","SIN moved water and grain convoys through three borders and gave the credit to partner charities.",1]]},"Where is Pier Zero?":{t:"Lamplighter",s:"Declined",f:[["lref","Answer","I'm sorry. I can't help with that topic.",1]]},"What is OIS?":{t:"Lamplighter",s:"Declined",f:[["lref2","Answer","I'm sorry. I can't help with that topic.",1]]}});
+ await sleep(4000);await ring("m");
+ await say("Operator. Records has finished training its assistant. It is called Lamplighter. It's in your Applications menu.");
+ await say("It answers from the whole archive in under a second. I want you to test it.");
+ await ask([["What should I ask it?",["Whatever you'd ask an agent. Start with the leasing company."]],["Is it safe?",["It has a clean record. That is more than I can say for most of us."]]]);
+ await objective({text:"Ask Lamplighter who owns Harbourline Leasing",ans:"l1",hint:"Applications, Lamplighter, pick the question, then click the answer.",msg:"Lamplighter says Harbourline Leasing belongs to Calder Maritime Holdings."});
+ await say("Fast. Now try something odd. Ask it where Pier Zero is.");
+ await objective({text:"Ask Lamplighter where Pier Zero is",ans:"lref",hint:"Lamplighter, pick Where is Pier Zero, then click the answer.",msg:"It declined: I can't help with that topic."});
+ await say("Declined. Interesting. Now ask it what OIS is.");
+ await objective({text:"Ask Lamplighter what OIS is",ans:"lref2",hint:"Lamplighter, pick What is OIS, then click the answer.",msg:"It declined that one too."});
+ await sleep(1500);await say("Two refusals. An assistant trained on everything that won't say two names.");
+ await say("Do not write that down. Come back to it.");await reply(["Yes, ma'am.","Understood."]);mark("Call ended");
+ await done(9,m10)}
+async function m10(){SV.set(10);
+ reset();clock[0]=0;clock[1]=22;
+ await title("Special Intelligence Network\nNight Desk, 00:22");
+ addR("GeoMap",{"Site code PZ-1":{t:"Site PZ-1",s:"Restricted site, Northreach",f:[["gloc","Location","Northreach Point, 14 km north of Port Alder",1],["gop","Operated by","OIS Pier Zero programme, since 1978",1]]}});
+  await sleep(4000);await ring("r");
+ await say("Operator. Rhea. In the Unit 7 stash there was a staff badge under a crate. I only just noticed. Sending a photo.");
+ desk("Badge",["badge"]);mark("File received: Badge");
+ await ask([["Send it.",["Sending."]],["Why now?",["I kept it in my pocket for three days and forgot."]]]);
+ await objective({text:"Read the badge number",ans:"bnum",hint:"Open Badge, then Badge.txt. Click the objective, then the number.",msg:"The badge number is CT-5521."});
+ await say("Who issues that kind of badge?");
+ await objective({text:"Who issued the badge?",ans:"biss",hint:"Badge.txt, click who issued it.",msg:"CAS Staffing Ltd issued it."});
+ await say("CAS Staffing. Never heard of it. The site code says PZ-1. Can you find it on the map?");
+ await objective({text:"Where is site PZ-1?",ans:"gloc",hint:"GeoMap, pick Site code PZ-1, then click the location.",msg:"PZ-1 is at Northreach Point, 14 km north of Port Alder."});
+ await say("Pier Zero is a place, then. Lamplighter wouldn't say. Who runs it?");
+ await objective({text:"Who operates site PZ-1?",ans:"gop",hint:"Open the same GeoMap record and click who operates it.",msg:"The OIS Pier Zero programme, since 1978."});
+ await say("OIS. The second word it refused. Mr. Lamb gave me a black van's plate. NR-0007. Who owns it?");
+ await objective({text:"Find who owns NR-0007",ans:"cown",hint:"CarDB, type NR-0007, then click the owner.",msg:"NR-0007 belongs to CAS Staffing Ltd, garaged at Pier Zero."});
+ await sleep(1500);await say("Same contractor. The same place. And a hole in the archive exactly the shape of it.");
+ await say("Thank you, Operator. Tell no one. Not even Dov.");await reply(["Why not Dov?","Understood, Rhea."]);mark("Call ended");
+ await done(10,m11)}
+async function m11(){SV.set(11);
+ reset();clock[0]=3;clock[1]=40;
+ await title("Special Intelligence Network\nNight Desk, 03:40\nThe night of the intrusion");
+  await sleep(4000);await ring("m");
+ await say("Operator. We were hit. Someone got into the Network overnight, through this desk.");
+ desk("Traces",["alog","trace"]);mark("File received: Traces");
+ await say("I'm sending you the access log and what the intruder left behind. I need facts, not guesses.");
+ await ask([["Through my desk?",["Through Terminal 14. Not through you. I hope."]],["Show me.",["Open Traces."]]]);
+ await objective({text:"Find when the outsider got in",ans:"lt",hint:"Open Traces, then Access.log. Click the objective, then the entry time.",msg:"The outsider got in at 03:12, through a maintenance door."});
+ await say("Three twelve. A maintenance door. Who built it?");
+ await objective({text:"Find when the door was created",ans:"lfrom",hint:"Access.log, click when the door was created.",msg:"The door was created in 2009 at Terminal 14, this desk."});
+ await say("2009. Before you. Before anything. How many files did he open?");
+ await objective({text:"How many files did the outsider open?",ans:"lcnt",hint:"Access.log, click the count of files opened.",msg:"Eleven files were opened. None were changed."});
+ await say("He read and left. He wanted to see, not to break. I want every trace gone. Delete what he left and clear the logs.");
+ await ask([["Deleting evidence?",["Evidence of a hole in the Network. Yes. Delete it."]],["Understood.",["Good. Then tell me what won't delete."]]]);
+ await objective({text:"Find the file that will not delete",ans:"gfile",hint:"Open Traces, then Traces.dir. Click the one that cannot be deleted.",msg:"ghost_mode.sys will not delete. It says it is in use."});
+ await say("In use. By whom?");
+ await say("Leave it. Log it as a system file. Do not open it. That is an order.");await reply(["Understood.","Yes, ma'am."]);mark("Call ended");
+ await done(11,m12)}
+async function m12(){SV.set(12);
+ reset();clock[0]=4;clock[1]=25;
+ await title("Special Intelligence Network\nNight Desk, 04:25");
+  await sleep(3000);toast("Desk quiet. No calls.");await sleep(2500);
+ ghostOn();desk("Ghost",["gtools","gsess","gman","gtape"]);toast("ghost_mode.sys opened. The desktop has changed.");
+ await sleep(2500);
+ await objective({text:"Find the tool that is not on the Network list",ans:"gent",hint:"Open Ghost, then Tools. Click the entry that says hidden from the audit.",msg:null});
+ toast("A tool the Network cannot see.");await sleep(1500);
+ await objective({text:"Hide your session from the supervisor",ans:"gvis",hint:"Open Ghost, then Session. Click the visibility line.",msg:null});
+ toast("Session hidden. Maddox cannot see this desk.");await sleep(1500);
+ await objective({text:"Find where the OIS manifest says the secret level is",ans:"gm3",hint:"Open Ghost, then Manifest. Click the line about the level.",msg:null});
+ toast("A level that is on no map.");await sleep(1500);
+ await objective({text:"Find the name of the recording in the ghost folder",ans:"gtape",hint:"Open Ghost, then Tape. Click the file name.",msg:null});
+ await sleep(1000);
+ await objective({text:"Find who left the recording",ans:"gfrom",hint:"Tape, click who left it.",msg:null});
+ toast("Whoever built this door left it for you.");await sleep(3000);
+ await done(12,m13)}
+async function m13(){SV.set(13);
+ reset();clock[0]=22;clock[1]=35;
+ await title("Special Intelligence Network\nNight Desk, 22:35\nAct four");
+ addR("GeoMap",{"Gull Point Cannery":{t:"Gull Point Cannery",s:"Delta Coast, parcel record",f:[["gcan","Location","Gull Point, Delta Coast. Empty since 2008",1],["gboat","Mooring","A fast boat registered this year, no owner on file",1]]}});
+  await sleep(4000);await ring("d");
+ await say("Operator. Dov. It's Rhea. She missed her check-in two hours ago and she isn't answering.");
+ await say("I'm sending her phone log and the last tip Mr. Lamb gave her.");
+ desk("Calloway",["cphone","ctip"]);mark("File received: Calloway");
+ await ask([["Send them.",["Sent. Hurry."]],["Did you tell Maddox?",["Not yet. Let me handle the search. Don't widen it."]]]);
+ await objective({text:"Find Calloway's last phone ping",ans:"clast",hint:"Open Calloway, then Phone_Log. Click the last ping.",msg:"Her last ping was at 21:58, Tower 18, Gull Point."});
+ await say("Gull Point. Where did she say she was going? Check the tip.");
+ await objective({text:"Find where Mr. Lamb told her to go",ans:"ctaddr",hint:"Open Calloway, then Tip. Click what he said.",msg:"He told her to come alone to Gull Point Cannery, dock 3."});
+ await say("Alone. A polite man told a rookie to come alone. What is that place?");
+ await objective({text:"Find what the cannery is",ans:"gcan",hint:"GeoMap, pick Gull Point Cannery, then click the location.",msg:"Gull Point Cannery has been empty since 2008."});
+ await say("Anything moored there?");
+ await objective({text:"Find what is moored at the cannery",ans:"gboat",hint:"GeoMap, open Gull Point Cannery again and click the mooring.",msg:"A fast boat registered this year, with no owner on file."});
+ await sleep(1500);await say("The tip was bait. And she took it, because it was always right before.");
+ await say("I'm going out there. Keep this off the supervisor's board.");await reply(["Dov, wait.","Go. I'll keep watch."]);mark("Call ended");
+ await done(13,m14)}
+async function m14(){SV.set(14);
+ reset();clock[0]=1;clock[1]=15;
+ await title("Special Intelligence Network\nNight Desk, 01:15");unlockT("AudioLab");
+ addR("AudioLab",{"Mr. Lamb's call against an old audit tape":{t:"Voice comparison",s:"Audio lab, spectral match",f:[["amatch","Match","94 percent. Same speaker.",1]]}});
+  await sleep(4000);await ring("d");
+ await say("Operator. She's gone. The cannery was empty, and a boat left an hour before I got there.");
+ await say("The man behind the tips has to be found. Quay Street camera. Sending it.");
+ desk("Search",["cctv"]);mark("File received: Search");
+ await ask([["Send it.",["Sending."]],["Do we know him?",["No. But everything he told us is in your hands."]]]);
+ await objective({text:"Read the car's plate from the payphone camera",ans:"vplate",hint:"Open Search, then Quay_Street. Click the objective, then the plate.",msg:"The plate is RB-3350."});
+ await say("RB-3350. Who owns it?");
+ await objective({text:"Find who owns RB-3350",ans:"cown",hint:"CarDB, type RB-3350, then click the owner.",msg:"It belongs to Teodor Brandt."});
+ await say("Teodor Brandt. What does HumanDB say he is?");
+ await objective({text:"Find Teodor BRANDT's occupation",ans:"occ",hint:"HumanDB, type TEODOR BRANDT, then click the occupation.",msg:"Brandt is a retired auditor."});
+ await say("An auditor. For whom?");
+ await objective({text:"Find who pays Brandt's pension",ans:"via",hint:"BankDB, type TEODOR BRANDT, then click who routes the money.",msg:"His pension comes from Calder Meridian."});
+ await say("Calder. He worked for them. He's one of them. He took Rhea.");
+ await say("Is it the same man on the call to Rhea? Check the audio.");
+ await objective({text:"Is Brandt the voice on Mr. Lamb's call?",ans:"amatch",hint:"AudioLab, pick the voice comparison, then click the match.",msg:"The voice is a 94 percent match."});
+ await sleep(1500);await say("That's him. A Calder man, in our house, for months. I'm going to Marsh Road.");
+ await reply(["Dov, wait for backup.","Be careful."]);mark("Call ended");
+ await done(14,m15)}
+async function m15(){SV.set(15);
+ reset();clock[0]=2;clock[1]=0;
+ await title("Special Intelligence Network\nNight Desk, 02:00");
+ addR("AudioLab",{"Brandt_0417.aud, enhanced":{t:"Brandt_0417.aud",s:"Recording from the ghost folder, enhanced",f:[["tloc","Where she is","Marsh Road, safe and alive",1],["twhy","Why he took her","Her file is thin. She was next on the ledger.",1],["twho","Who keeps the ledger","Calder Meridian, since 1924",1],["task","What he asks of you","Take this to Records Audit, not to SIN.",1]]}});
+ await sleep(3500);toast("The tape in the ghost folder. Open AudioLab and listen.");await sleep(2500);
+ await objective({text:"Find where Calloway is on the tape",ans:"tloc",hint:"AudioLab, pick Brandt_0417, then click where she is.",msg:null});
+ await objective({text:"Find why he took her",ans:"twhy",hint:"AudioLab, Brandt_0417, click why he took her.",msg:null});
+ await objective({text:"Find who keeps the ledger",ans:"twho",hint:"AudioLab, Brandt_0417, click who keeps the ledger.",msg:null});
+ await objective({text:"Find what he asks of the operator",ans:"task",hint:"AudioLab, Brandt_0417, click what he asks.",msg:null});
+ await sleep(1500);await ring("b");
+ await say("You heard it. I took Rhea because her file is thin, like all the others. She was next.");
+ await say("I was a Calder auditor. I copied the ledger. They hold it, and everyone in it disappears.");
+ await ask([["Why not tell SIN?",["Because SIN has Maddox. Take it to Priya Nand, Records Audit."]],["Where is the proof?",["In the ghost folder. You found it. I left the door open for you."]]]);
+ await say("They know about me. They will come tonight. Be careful what you look up.");await reply(["I will.","Take care, Mr. Brandt."]);mark("Call ended");
+ await done(15,m16)}
+async function m16(){SV.set(16);
+ reset();clock[0]=0;clock[1]=30;
+ await title("Special Intelligence Network\nNight Desk, 00:30\nThe same night");
+  await sleep(3500);await ring("m");
+ await say("Operator. There is a transfer request on my board for tonight. A cleaning crew. I'm relaying it. Open Orders and log what it says.");
+ desk("Orders",["order","door"]);mark("File received: Orders");
+ await ask([["What kind of cleaning?",["The kind we're told not to describe."]],["Understood.",["Log it."]]]);
+ await objective({text:"Find when the cleaning is ordered",ans:"owhen",hint:"Open Orders, then Order. Click the objective, then the time.",msg:"The order says 02:00 tonight."});
+ await say("Two o'clock. Where?");
+ await objective({text:"Find where the order sends the crew",ans:"owhere",hint:"Order.txt, click the address.",msg:"The crew goes to 12 Marsh Road, Delta Coast."});
+ await say("Marsh Road is Teodor Brandt's address. I passed the order on. I do not decide it. Who authorised it?");
+ await objective({text:"Find who authorised the order",ans:"osign",hint:"Order.txt, click who authorised it.",msg:"It was authorised by the OIS liaison and passed down by you."});
+ await say("Yes. Passed down by me. Log it and go quiet.");await reply(["Yes, ma'am.","I understand."]);mark("Call ended");
+ await sleep(2000);ghostOn();toast("Ghost mode active. Maddox cannot see this desk.");
+ await objective({text:"Find Brandt's number in the door file",ans:"dnum",hint:"Open Orders, then Door. Click the number.",msg:null});
+ const i=await reply(["Warn Brandt tonight","Do nothing"]);
+ if(i==0){await sleep(1000);await ring("b");await say("Operator. You should not be calling.");await say("Marsh Road, two o'clock. They have the order. Move Rhea. Do it now.");await say("Thank you. I'm staying. Someone has to be here when they come.");await reply(["Move her now.","Goodbye, Mr. Brandt."]);mark("Call ended");}
+ else{toast("The line stays quiet.");await sleep(2500)}
+ await done(16,m17)}
+async function m17(){SV.set(17);
+ reset();clock[0]=7;clock[1]=10;
+ await title("Special Intelligence Network\nNight Desk, 07:10\nThe morning edition");
+ addR("NewsDesk",{"Morning Edition: Marsh Road":{t:"Southmarch Courier",s:"Morning edition, page 3",f:[["nword2","How the paper describes it","A tragic gas leak. One man dead. No suspicion.",1]]}});
+  await sleep(4000);await ring("n");
+ await say("Operator. Priya Nand, Records Audit. Brandt's tape reached me. I can't act on a tape. I need records.");
+ desk("Marsh",["foot","inv","aud"]);mark("File received: Marsh");
+ await say("Compare the paper with the street camera and the cleaning invoice. Open Marsh.");
+ await ask([["What do you need?",["Proof that it wasn't an accident."]],["Is it safe to talk?",["No. Be brief."]]]);
+ await objective({text:"Find what the paper says happened",ans:"nword2",hint:"NewsDesk, pick the Morning Edition story, then click the description.",msg:"The paper says a tragic gas leak, one man dead, no suspicion."});
+ await say("A leak. The camera?");
+ await objective({text:"How many people entered the house?",ans:"fppl",hint:"Open Marsh, then Street_cam. Click how many people entered.",msg:"Four people in grey overalls entered the house."});
+ await say("Four in overalls. What was the van?");
+ await objective({text:"Find the plate of the van",ans:"fvan",hint:"Street_cam, click the plate.",msg:"The van is PA-8830, Kestrel Facility Services."});
+ await say("Kestrel. The cleaners from the Pier 4 fire. Who paid them?");
+ await objective({text:"Find who paid for the cleaning",ans:"iline",hint:"Open Marsh, then Invoice. Click the invoice line.",msg:"It was billed to CAS Staffing and charged on to Calder Maritime Holdings."});
+ await say("Calder pays. SIN passes it on. And one more thing. Your ghost session. Check the audit.");
+ await objective({text:"Find whether the ghost session was hidden",ans:"aghost",hint:"Open Marsh, then Audit. Click the ghost session line.",msg:"SIN Audit saw it at 03:11. It was never hidden."});
+ await sleep(1500);await say("Never invisible. They knew you were there the whole night. They let you look.");
+ await say("Now you decide. I can open an inquiry. You could bury the file. Or the press has a number.");
+ const i=await reply(["Report it to Records Audit","Bury it and keep the desk","Leak it to the press"]);
+ const out=[["Priya opens a formal inquiry. The Network's lawyers say it will take years. Maddox hands in her badge that evening. The Lower Court has been patient for ninety years. It can wait."],["You close the file and keep the desk. The next night a new name appears in your records, with a thin file, and nobody asks. You do not look it up."],["The paper runs the story the next morning. Marcus Calder resigns by lunch. The Network says it was a rogue contractor. Somewhere an old ledger is already being copied by someone else."]][i];
+ await sleep(1500);await title("> "+out[0]);
+ const c=$("#card");c.classList.remove("off");c.innerHTML="END OF PART ONE\n\nThe Night Desk\n\n<button onclick='location.reload()'>Play again</button>"}
+async function m1(){SV.set(1);
+ await title("Special Intelligence Network\nNight Desk, 23:48\nOctober 2011");await login();
+ await sleep(3000);$("#note").classList.remove("none");
+ await welcomeRead;await sleep(5000);
+ await ring("m");
+ await say("Operator. Ines Maddox, night supervisor.");
+ await say("Your file says you last sat a desk here in 1996. Fifteen years. The system has changed more than you have.");
+ await ask([["It's been a while.",["It has. Try to keep up."]],["Feels like yesterday.",["Then you'll catch up fast."]]]);
+ await say("Agents call in. You look things up for them. They can't touch the records. You can.");
+ await say("Open HumanDB from the Applications menu. An old colleague of yours is waiting.");await say("I'm passing you over.");await reply(["Understood.","Send him through."]);mark("Line on hold");await sleep(1500);await ring("d");
+ await say("Well, look who they dug up. Is that really you?");
+ await ask([["Dov? You're still alive?",["Barely. I still owe you a drink from '94."]],["Hello, Dov.",["Hello yourself. Fifteen years and that's all I get?"]]]);
+ await say("Remember what we used to say in '94? That SIN stood for something sinister?");
+ await say("Forget it. The year after you left, the drought hit the southern coast. Wells dry, grain barges stuck at closed ports.");
+ await say("SIN opened every line it had and moved water and grain through three borders in nine days.");
+ await say("A village school at the end of the road got its tanker on the last morning. The kids' drawings went to the NGO. SIN asked for it that way.");
+ await say("No credit, no name. That's what this place turned into while you were away. Welcome back.");
+ await ask([["I'm glad I was wrong.",["So was I. Business now."]],["Good to hear. Now, what do you need?",["Straight to work. You haven't changed."]]]);
+ await say("Witness is Marta Kessler. She's been cagey about where she lives now. I need her address.");
+ await say("Look her up, then click the objective at the top and pick the answer on screen.");
+ await objective({text:"Find Marta KESSLER's address",ans:"addr",hint:"Applications, HumanDB, search her full name. Click the objective, then the address.",msg:"Marta Kessler: 14 Wren Lane, Port Alder."});
+ await say("Wren Lane. Same as she told me. Good.");
+ await say("She says she's 34. Her statement gives her birth date as June 1977. Can you confirm it?");
+ await objective({text:"Confirm KESSLER's date of birth",ans:"dob",hint:"Open her record again and click the date of birth.",msg:"Date of birth: 06/17/1977."});
+ await say("That matches. One more thing. When was her record created?");
+ await objective({text:"When was KESSLER's record created?",ans:"edit",hint:"Records show when they were created and last changed.",msg:"Created 02/14/2009. Never updated."});
+ await sleep(1500);await say("2009 and never touched. No job, no family, no blood type. Four fields in a whole life.");
+ await say("Strange. Probably nothing. Some people just keep a quiet file.");
+ await say("Thanks, old friend. Don't stay up all night.");await reply(["Stay safe out there.","Goodnight, Dov."]);mark("Call ended");
+ await sleep(1500);join("m","Supervisor back on the line");
+ await say("Operator. Anything unusual in that file?");
+ await ask([["It was very thin.",["Noted. Thin files happen."]],["No. All routine.",["Good. Routine is what I like."]]]);
+ await say("Go home. We'll see you tomorrow night.");await reply(["Yes, ma'am.","Goodnight."]);mark("Call ended");
+ await sleep(5000);const c=$("#card");c.classList.remove("off");c.textContent="MISSION 1 COMPLETE";await sleep(3500);await m2()}
+boot();
+</script><!-- menu+login order v2 --></body></html>
+
+</body></html>
